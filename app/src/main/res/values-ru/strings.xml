@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Motivation</string>
+    <string name="text_media">Motivation!</string>
+    <string name="enter_text">Введите текст</string>
+    <string name="sent">Отправить</string>
+    <string name="edit_post">Редактирование поста</string>
+    <string name="cancel">Отмена</string>
+    <string name="picture">картинка</string>
+    <string name="avatar">Аватар</string>
+    <string name="text_like">Лайки</string>
+    <string name="name_menubutton">Меню</string>
+    <string name="add_post">Добавить</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
+    <string name="save">Сохранить</string>
+    <string name="text_enter_video">Введите ссылку</string>
+</resources>

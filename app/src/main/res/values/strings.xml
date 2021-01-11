@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Motivation</string>
+    <string name="text_media">Motivation!</string>
+    <string name="enter_text">Enter text</string>
+    <string name="sent">Send</string>
+    <string name="edit_post">Editing text</string>
+    <string name="cancel">Cancel</string>
+    <string name="picture">picture</string>
+    <string name="avatar">Avatar</string>
+    <string name="text_like">Like</string>
+    <string name="name_menubutton">menuButton</string>
+    <string name="add_post">Add</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="text_enter_video">Enter URL</string>
+</resources>

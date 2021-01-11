@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/editTextPost"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
+        android:layout_margin="15sp"
+        android:autofillHints="false"
+        android:background="@drawable/border"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toTopOf="@+id/inputUrlVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="LabelFor" />
+
+    <EditText
+        android:id="@+id/inputUrlVideo"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_margin="15sp"
+        android:autofillHints="false"
+        android:ems="10"
+        android:hint="@string/text_enter_video"
+        android:inputType="textUri"
+        app:layout_constraintBottom_toTopOf="@+id/layoutVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPost" />
+
+
+    <FrameLayout
+        android:id="@+id/layoutVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/addImageBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/inputImagePost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxWidth="350sp"
+            android:maxHeight="350sp"
+            android:adjustViewBounds="true"
+            android:layout_margin="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/addImageBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inputUrlVideo"
+            app:srcCompat="@android:drawable/ic_dialog_info" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/addImageBtn"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_margin="15sp"
+        android:layout_marginBottom="15dp"
+        android:text="Добавить картинку"
+        app:layout_constraintBottom_toTopOf="@+id/savePost"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Button
+        android:id="@+id/savePost"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_margin="15sp"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
