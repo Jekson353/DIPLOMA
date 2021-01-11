@@ -14,4 +14,6 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="text_enter_video">Enter URL</string>
+    <string name="addImage">Edd Image</string>
+    <string name="image_description">Image</string>
 </resources>

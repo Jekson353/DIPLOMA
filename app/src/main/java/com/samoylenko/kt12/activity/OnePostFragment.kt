@@ -119,7 +119,7 @@ class OnePostFragment : Fragment() {
 //        }
         if (!onePost.image.equals("")){
             binding.layoutVideo.visibility = View.VISIBLE
-            binding.imageViewPlay.setImageURI(onePost.image.toUri())
+            binding.inputImagePost.setImageURI(onePost.image.toUri())
         }
 
         return binding.root

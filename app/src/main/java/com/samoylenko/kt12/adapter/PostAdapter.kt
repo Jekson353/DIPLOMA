@@ -1,9 +1,12 @@
 package com.samoylenko.kt12.adapter
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +14,8 @@ import com.samoylenko.kt12.R
 import com.samoylenko.kt12.databinding.CardPostBinding
 import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.util.Calc
+import java.io.File
+
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -60,9 +65,21 @@ class PostViewHolder(
             like.text = Calc.intToText(post.like)
             share.text = post.sharing.toString()
             like.isChecked = post.likedByMe
-            if (!post.video.equals("")) {
+//            if (!post.video.equals("")) {
+//                layoutVideo.visibility = View.VISIBLE
+//                //videoViewPlay.text = post.video
+//            }
+            if (!post.image.equals("")) {
                 layoutVideo.visibility = View.VISIBLE
-                //videoViewPlay.text = post.video
+                inputImagePost.setImageURI(post.image.toUri())
+//                val imgFile = File(post.image)
+//                if (imgFile.exists()) {
+//                    val myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+//                    //val myImage: ImageView = findViewById(R.id.imageviewTest) as ImageView
+//                    inputImagePost.setImageBitmap(myBitmap)
+//                }else{
+//                    author.text = "Картинка не найдена"
+//                }
             }
 
             like.setOnClickListener {
@@ -90,7 +107,7 @@ class PostViewHolder(
                     }
                 }.show()
             }
-            imageViewPlay.setOnClickListener {
+            inputImagePost.setOnClickListener {
                 onInteractionListener.playVideo(post)
             }
 

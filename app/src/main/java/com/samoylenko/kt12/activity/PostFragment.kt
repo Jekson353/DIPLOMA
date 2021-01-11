@@ -40,8 +40,9 @@ class PostFragment : Fragment() {
 
         binding.editTextPost.setText(textPost)
         binding.inputUrlVideo.setText(urlVideo)
-        if (image != null) {
-            binding.inputImagePost.setImageURI(image.toUri())
+        if (!image.equals("")) {
+            binding.layoutVideo.visibility = View.VISIBLE
+            binding.inputImagePost.setImageURI(image?.toUri())
         }
         binding.editTextPost.requestFocus()
 

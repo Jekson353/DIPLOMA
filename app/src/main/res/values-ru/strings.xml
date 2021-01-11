@@ -15,4 +15,6 @@
     <string name="edit">Редактировать</string>
     <string name="save">Сохранить</string>
     <string name="text_enter_video">Введите ссылку</string>
+    <string name="addImage">Добавить картинку</string>
+    <string name="image_description">Image</string>
 </resources>

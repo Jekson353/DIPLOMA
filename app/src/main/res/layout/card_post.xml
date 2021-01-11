@@ -87,14 +87,15 @@
         app:layout_constraintTop_toBottomOf="@+id/text_Data">
 
         <ImageView
-            android:id="@+id/imageViewPlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxWidth="350sp"
-            android:maxHeight="350sp"
+            android:id="@+id/inputImagePost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
             android:adjustViewBounds="true"
             android:elevation="4dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:contentDescription="@string/image_description"
+            app:srcCompat="@android:drawable/ic_dialog_info"/>
 
     </FrameLayout>
 
