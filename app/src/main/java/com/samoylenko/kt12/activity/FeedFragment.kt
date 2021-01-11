@@ -3,9 +3,7 @@ package com.samoylenko.kt12.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,11 +21,32 @@ class FeedFragment : Fragment() {
     private val binding by lazy {
         FragmentFeedBinding.inflate(layoutInflater)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.action_bar, menu);
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.getItemId()
+
+        if (id == R.id.index_page) {
+            viewModel.onIndexPage()
+        }
+        if (id == R.id.about) {
+            Toast.makeText(requireActivity(), "О приложении", Toast.LENGTH_LONG).show()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
+
         val adapter = PostAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
@@ -37,8 +56,24 @@ class FeedFragment : Fragment() {
                 viewModel.likeById(post.id)
             }
 
+            override fun onLikes(post: Post) {
+                viewModel.likesById(post.id)
+            }
+
             override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
+            }
+
+            override fun onDislike(post: Post) {
+                viewModel.dislikeById(post.id)
+            }
+
+            override fun onAuthor(post: Post) {
+                viewModel.viewByAuthor(post.author)
+            }
+
+            override fun onIndexPage() {
+                viewModel.onIndexPage()
             }
 
             override fun onClickPost(post: Post) {

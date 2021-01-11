@@ -58,7 +58,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             null,
             null,
             null,
-            "${PostColumns.COLUMN_ID} DESC"
+            "${PostColumns.COLUMN_LIKES} DESC"
         ).use {
             while (it.moveToNext()) {
                 posts.add(map(it))
@@ -73,6 +73,26 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 UPDATE posts SET
                     likes = likes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
                     likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
+                WHERE id = ?;
+            """.trimIndent(), arrayOf(id)
+        )
+    }
+
+    override fun likesById(id: Long) {
+        db.execSQL(
+            """
+                UPDATE posts SET
+                    likes = likes + 1
+                WHERE id = ?;
+            """.trimIndent(), arrayOf(id)
+        )
+    }
+
+    override fun dislikeById(id: Long) {
+        db.execSQL(
+            """
+                UPDATE posts SET
+                    likes = likes - 1
                 WHERE id = ?;
             """.trimIndent(), arrayOf(id)
         )
@@ -95,7 +115,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             }
             put(PostColumns.COLUMN_AUTHOR, "Локальное сохранение")
             put(PostColumns.COLUMN_CONTENT, post.content)
-            put(PostColumns.COLUMN_PUBLISHED, "только что")
+            put(PostColumns.COLUMN_PUBLISHED, post.published)
             put(PostColumns.COLUMN_LIKED_BY_ME, post.likedByMe)
             put(PostColumns.COLUMN_LIKES, post.like)
             put(PostColumns.COLUMN_VISABILITY, post.countVisability)

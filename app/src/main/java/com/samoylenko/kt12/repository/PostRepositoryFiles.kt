@@ -15,6 +15,12 @@ class PostRepositorySQLiteImpl(
         data.value = posts
     }
 
+    override fun onIndexPage(): LiveData<List<Post>> {
+        posts = dao.getAll()
+        data.value = posts
+        return data
+    }
+
 
     override fun getAll(): LiveData<List<Post>> = data
 
@@ -29,6 +35,30 @@ class PostRepositorySQLiteImpl(
                 } else {
                     it.copy(likedByMe = !it.likedByMe, like = it.like + 1)
                 }
+            }
+        }
+        data.value = posts
+    }
+
+    override fun likesById(id: Long) {
+        dao.likesById(id)
+        posts = posts.map {
+            if (it.id != id) {
+                it
+            } else {
+                it.copy(like = it.like + 1)
+            }
+        }
+        data.value = posts
+    }
+
+    override fun dislikeById(id: Long) {
+        dao.dislikeById(id)
+        posts = posts.map {
+            if (it.id != id) {
+                it
+            } else {
+                it.copy(like = it.like - 1)
             }
         }
         data.value = posts
@@ -60,8 +90,13 @@ class PostRepositorySQLiteImpl(
     }
 
     override fun removeById(id: Long) {
-        dao.removeById(id)
+        //dao.removeById(id)
         posts = posts.filter { it.id != id }
+        data.value = posts
+    }
+
+    override fun viewByAuthor(author: String) {
+        posts = posts.filter { it.author == author }
         data.value = posts
     }
 }

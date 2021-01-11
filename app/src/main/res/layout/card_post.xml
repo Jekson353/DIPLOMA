@@ -75,16 +75,31 @@
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         tools:text="@sample/test_data.json/data/content" />
 
+    <TextView
+        android:id="@+id/urlLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:autoLink="web"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/layoutVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_Data"
+        tools:text="https://www.yandex.ru" />
+
     <FrameLayout
         android:id="@+id/layoutVideo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/barrier_end"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_Data">
+        app:layout_constraintTop_toBottomOf="@+id/urlLink">
+
+
 
         <ImageView
             android:id="@+id/inputImagePost"
@@ -95,7 +110,7 @@
             android:elevation="4dp"
             android:layout_gravity="center"
             android:contentDescription="@string/image_description"
-            app:srcCompat="@android:drawable/ic_dialog_info"/>
+            tools:srcCompat="@android:drawable/ic_dialog_info"/>
 
     </FrameLayout>
 
@@ -108,18 +123,42 @@
         app:constraint_referenced_ids="layoutVideo"
         tools:layout_editor_absoluteY="230dp" />
 
+    <ImageButton
+        android:id="@+id/likes"
+        android:layout_width="55sp"
+        android:layout_height="48sp"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:src="@mipmap/ic_like_foreground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutVideo" />
+
+
+    <ImageButton
+        android:id="@+id/dislike"
+        android:layout_width="55sp"
+        android:layout_height="48sp"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:src="@mipmap/ic_dislike_foreground"
+        app:layout_constraintBottom_toBottomOf="@+id/likes"
+        app:layout_constraintStart_toEndOf="@+id/likes"
+        app:layout_constraintTop_toTopOf="@+id/likes" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="120dp"
         android:background="@android:color/transparent"
         android:checkable="true"
         android:contentDescription="@string/text_like"
         android:textColor="@color/black"
         app:icon="@drawable/selector_like"
         app:iconTint="@color/like_checkbox_tint_color"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/barrier_end"
+        app:layout_constraintBottom_toBottomOf="@+id/dislike"
+        app:layout_constraintStart_toEndOf="@+id/dislike"
+        app:layout_constraintTop_toTopOf="@+id/dislike"
         tools:checkable="true"
         tools:text="@sample/test_data.json/data/likes" />
 
@@ -134,26 +173,13 @@
         app:icon="@drawable/ic_baseline_share_24"
         app:iconTint="@color/grey"
         app:layout_constraintBottom_toBottomOf="@+id/like"
-        app:layout_constraintStart_toEndOf="@+id/like"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/like"
+        app:layout_constraintVertical_bias="0.0"
         tools:checkable="true"
         tools:text="@sample/test_data.json/data/shares" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/visability"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:checkable="true"
-        android:contentDescription="@string/text_like"
-        android:textColor="@color/black"
-        app:icon="@drawable/ic_baseline_visibility_24"
-        app:iconTint="@color/grey"
-        app:layout_constraintBottom_toBottomOf="@+id/like"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/like"
-        tools:checkable="true"
-        tools:text="@sample/test_data.json/data/views" />
+
 
     <View
         android:id="@+id/divider"

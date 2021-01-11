@@ -5,6 +5,10 @@ import java.text.DecimalFormat
 object Calc {
     fun intToText(like: Int): String {
         when (like) {
+            in -10000 downTo -999999 -> return calcLike(like, 0) + "K"
+            in -1100 downTo -9999 -> return calcLike(like, 1) + "K"
+            in -1000 downTo -1099 -> return "- 1K"
+            in -999..0 -> return like.toString()
             in 0..999 -> return like.toString()
             in 1000..1099 -> return "1K"
             in 1100..9999 -> return calcLike(like, 1) + "K"

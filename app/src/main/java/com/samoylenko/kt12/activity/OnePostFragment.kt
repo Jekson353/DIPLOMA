@@ -16,6 +16,7 @@ import com.samoylenko.kt12.R
 import com.samoylenko.kt12.databinding.CardPostBinding
 import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.viewmodel.PostViewModel
+import kotlinx.android.synthetic.main.card_post.*
 
 
 class OnePostFragment : Fragment() {
@@ -48,6 +49,12 @@ class OnePostFragment : Fragment() {
             }
         }
 
+        binding.likes.setOnClickListener {
+            if (postId != null) {
+                viewModel.likesById(postId)
+            }
+        }
+
 
         binding.menu.setOnClickListener {
             PopupMenu(it.context, it).apply {
@@ -59,6 +66,15 @@ class OnePostFragment : Fragment() {
                                 viewModel.removeById(postId)
                                 findNavController().navigateUp()
                             }
+                            true
+                        }
+                        R.id.viewPostAuthor -> {
+                            //if (postId != null) {
+                                if (onePost != null) {
+                                    viewModel.viewByAuthor(onePost.author)
+                                }
+                                findNavController().navigateUp()
+                            //}
                             true
                         }
                         R.id.editView -> {
@@ -104,11 +120,11 @@ class OnePostFragment : Fragment() {
 
         view?.isVisible = false
 
-        binding.imgAvatar.setImageResource(R.drawable.ic_netology)
+        binding.imgAvatar.setImageResource(R.drawable.icon_app)
         binding.author.text = onePost!!.author
         binding.txtDate.text = onePost.published
         binding.textData.text = onePost.content
-        binding.visability.text = onePost.countVisability.toString()
+        //binding.visability.text = onePost.countVisability.toString()
         binding.like.text = onePost.like.toString()
         binding.share.text = onePost.sharing.toString()
         binding.like.isChecked = onePost.likedByMe

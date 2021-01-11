@@ -41,6 +41,11 @@ class PostFragment : Fragment() {
         binding.editTextPost.setText(textPost)
         binding.inputUrlVideo.setText(urlVideo)
         if (!image.equals("")) {
+            if (image != null) {
+                tempUriImage = image
+            }
+        }
+        if (!image.equals("")) {
             binding.layoutVideo.visibility = View.VISIBLE
             binding.inputImagePost.setImageURI(image?.toUri())
         }
@@ -54,18 +59,26 @@ class PostFragment : Fragment() {
         }
 
         binding.inputImagePost.setOnClickListener {
-            //layoutVideo.visibility = View.VISIBLE
+            layoutVideo.visibility = View.GONE
+            tempUriImage = ""
             inputImagePost.setImageResource(0)
         }
 
         binding.savePost.setOnClickListener {
             val content = binding.editTextPost.text.toString()
             val urlPost = binding.inputUrlVideo.text.toString()
-            val uriImage = tempUriImage.toString()
+            val uriImage = tempUriImage
             if (content.isEmpty()){
                 Toast.makeText(
                     requireActivity(),
                     "Текст не может быть пустым",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }else if (content.length > 100){
+                Toast.makeText(
+                    requireActivity(),
+                    "Количество символов не более 100. Сейчас их ${content.length}",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
