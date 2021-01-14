@@ -18,6 +18,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 ${PostColumns.COLUMN_VISABILITY} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_SHARED} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_IMAGE} TEXT DEFAULT "",
+                ${PostColumns.COLUMN_IMAGE_URI} TEXT DEFAULT "",
                 ${PostColumns.COLUMN_URL_VIDEO} TEXT DEFAULT ""
             );
             """.trimIndent()
@@ -34,6 +35,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
         const val COLUMN_VISABILITY = "visability"
         const val COLUMN_SHARED = "shared"
         const val COLUMN_IMAGE = "image"
+        const val COLUMN_IMAGE_URI = "imageUri"
         const val COLUMN_URL_VIDEO = "urlVideo"
         val ALL_COLUMNS = arrayOf(
             COLUMN_ID,
@@ -45,6 +47,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             COLUMN_VISABILITY,
             COLUMN_SHARED,
             COLUMN_IMAGE,
+            COLUMN_IMAGE_URI,
             COLUMN_URL_VIDEO
         )
     }
@@ -121,6 +124,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             put(PostColumns.COLUMN_VISABILITY, post.countVisability)
             put(PostColumns.COLUMN_SHARED, post.sharing)
             put(PostColumns.COLUMN_IMAGE, post.image)
+            put(PostColumns.COLUMN_IMAGE_URI, post.imageUri)
             put(PostColumns.COLUMN_URL_VIDEO, post.video)
         }
         val id = db.replace(PostColumns.TABLE, null, values)
@@ -158,6 +162,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 countVisability = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_VISABILITY)),
                 sharing = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_SHARED)),
                 image = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE)),
+                imageUri = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE_URI)),
                 video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_URL_VIDEO))
             )
         }

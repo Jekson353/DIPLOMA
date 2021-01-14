@@ -1,12 +1,17 @@
 package com.samoylenko.kt12.activity
 
 import android.content.Intent
+import android.content.Intent.EXTRA_STREAM
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -16,18 +21,20 @@ import com.samoylenko.kt12.R
 import com.samoylenko.kt12.databinding.CardPostBinding
 import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.viewmodel.PostViewModel
-import kotlinx.android.synthetic.main.card_post.*
+import java.io.File
 
 
+const val REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE = 21
 class OnePostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
-
+    var posts: Post? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val binding = CardPostBinding.inflate(inflater, container, false)
         val postId = arguments?.getLong("idPost")
+
         val onePost: Post? = postId?.let {
             Post(
                 id = it,
@@ -39,9 +46,11 @@ class OnePostFragment : Fragment() {
                 countVisability = arguments?.getInt("visability")!!,
                 video = arguments?.getString("video")!!,
                 image = arguments?.getString("image")!!,
+                imageUri = arguments?.getString("imageUri")!!,
                 likedByMe = arguments?.getBoolean("likedByMe")!!
             )
         }
+        posts = onePost
 
         binding.like.setOnClickListener {
             if (postId != null) {
@@ -70,10 +79,10 @@ class OnePostFragment : Fragment() {
                         }
                         R.id.viewPostAuthor -> {
                             //if (postId != null) {
-                                if (onePost != null) {
-                                    viewModel.viewByAuthor(onePost.author)
-                                }
-                                findNavController().navigateUp()
+                            if (onePost != null) {
+                                viewModel.viewByAuthor(onePost.author)
+                            }
+                            findNavController().navigateUp()
                             //}
                             true
                         }
@@ -99,23 +108,116 @@ class OnePostFragment : Fragment() {
         }
 
         binding.share.setOnClickListener {
-            Intent(Intent.ACTION_SEND)
-                .putExtra(Intent.EXTRA_TEXT, onePost?.content)
-                .setType("text/plain")
-                .also {
-                    if (it.resolveActivity(requireActivity().packageManager) == null) {
-                        Toast.makeText(
-                            requireActivity(),
-                            "Нет приложений для отправки сообщений",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        if (postId != null) {
-                            viewModel.shareById(postId)
-                        }
-                        startActivity(it)
-                    }
-                }
+            val file = File(onePost!!.image)
+            val uri: Uri = file.toUri()
+            val filename: String = file.name
+            val intent = Intent(Intent.ACTION_SEND)
+
+            val myPhotoFileUri = FileProvider.getUriForFile(
+                requireActivity(),
+                requireActivity().applicationContext.packageName + ".provider",
+                file
+            )
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.putExtra(EXTRA_STREAM, myPhotoFileUri)
+
+            val text = onePost.author + "\n" + onePost.content
+            intent.putExtra(Intent.EXTRA_TEXT, text)
+
+            intent.type = "image/*"
+            //intent.putExtra(Intent.EXTRA_STREAM, myPhotoFileUri)
+            //requireContext().startActivity(intent)
+            if (activity?.packageManager?.let { it1 -> intent.resolveActivity(it1) } != null) {
+                startActivity(Intent.createChooser(intent, "Your title"))
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    "Нет приложений для отправки сообщений",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+
+//            val permissionStatus =
+//                ContextCompat.checkSelfPermission(
+//                    requireActivity(),
+//                    Manifest.permission.READ_EXTERNAL_STORAGE
+//                )
+//
+//            if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+//                Toast.makeText(
+//                    requireActivity(),
+//                    "есть разрешения",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                val uri: Uri = Uri.parse(posts?.imageUri)
+//                val intent = Intent(Intent.ACTION_GET_CONTENT)
+//                intent.type = "image/*"
+//                intent.putExtra(Intent.EXTRA_STREAM, uri)
+//                //requireContext().startActivity(intent)
+//                if (activity?.packageManager?.let { it1 -> intent.resolveActivity(it1) } != null) {
+//                    startActivity(intent)
+//                } else {
+//                    Toast.makeText(
+//                        requireActivity(),
+//                        "Нет приложений для отправки сообщений",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            } else {
+//                Toast.makeText(
+//                    requireActivity(),
+//                    "запрашивается разрешение",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                ActivityCompat.requestPermissions(
+//                    requireActivity(), arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+//                    REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE
+//                )
+//            }
+
+
+            //val uri: Uri = Uri.parse(onePost?.imageUri)
+//            val uri = FileProvider.getUriForFile(requireContext(),
+//                BuildConfig.APPLICATION_ID + ".provider",onePost?.image)
+
+            //val intent = Intent(Intent.ACTION_SEND)
+//            intent.putExtra(Intent.EXTRA_STREAM, uri)
+//            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+//            intent.type = "image/*"
+//            intent.putExtra(Intent.EXTRA_TEXT, onePost?.content.toString())
+//            val title = onePost?.author
+//            val chooser = Intent.createChooser(intent, title)
+//            if (activity?.packageManager?.let { it1 -> intent.resolveActivity(it1) } != null) {
+//                startActivity(chooser)
+//            } else {
+//                Toast.makeText(
+//                    requireActivity(),
+//                    "Нет приложений для отправки сообщений",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            }
+
+//            Intent(Intent.ACTION_SEND_MULTIPLE)
+//                .putExtra(Intent.EXTRA_STREAM, uri)
+//                .putExtra(Intent.EXTRA_TEXT, onePost?.content.toString())
+//                .putExtra(Intent.EXTRA_TEXT, onePost?.author.toString())
+//
+//                .setType("*/*")
+//                .also {
+//                    if (it.resolveActivity(requireActivity().packageManager) == null) {
+//                        Toast.makeText(
+//                            requireActivity(),
+//                            "Нет приложений для отправки сообщений",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                    } else {
+//                        if (postId != null) {
+//                            viewModel.shareById(postId)
+//                        }
+//                        startActivity(it)
+//                    }
+//                }
         }
 
         view?.isVisible = false
@@ -141,4 +243,46 @@ class OnePostFragment : Fragment() {
         return binding.root
     }
 
+    //попытка расшарить через разрешения
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
+                if (grantResults.size > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // permission granted
+                    val uri: Uri = Uri.parse(posts?.imageUri)
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "image/*"
+                    intent.putExtra(EXTRA_STREAM, uri)
+                    //requireContext().startActivity(intent)
+                    if (activity?.packageManager?.let { it1 ->
+                            intent.resolveActivity(
+                                it1
+                            )
+                        } != null) {
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(
+                            requireActivity(),
+                            "Нет приложений для отправки сообщений",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    // permission denied
+                    Toast.makeText(
+                        requireActivity(),
+                        "Доступ не разрешили",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                return
+            }
+        }
+    }
 }

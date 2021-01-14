@@ -10,5 +10,6 @@ data class Post (
     var countVisability: Int,
     val video: String,
     val image: String,
+    val imageUri: String,
     val likedByMe: Boolean = false
 )

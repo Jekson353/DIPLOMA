@@ -88,6 +88,7 @@ class FeedFragment : Fragment() {
                 bundle.putString("image", post.image)
                 bundle.putString("video", post.video)
                 bundle.putBoolean("likedByMe", post.likedByMe)
+                bundle.putString("imageUri", post.imageUri)
                 findNavController().navigate(R.id.action_feedFragment_to_onePostFragment, bundle)
             }
 
@@ -142,6 +143,7 @@ class FeedFragment : Fragment() {
             bundle.putString("textPost", post.content)
             bundle.putString("urlVideo", post.video)
             bundle.putString("image", post.image)
+
             findNavController().navigate(R.id.action_feedFragment_to_postFragment, bundle)
         })
 

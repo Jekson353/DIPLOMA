@@ -21,6 +21,7 @@ private val empty = Post(
     countVisability = 0,
     video = "",
     image = "",
+    imageUri = "",
     likedByMe = false
 )
 
@@ -47,7 +48,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-    fun changeContent(content: String, video: String, uriImage: String) {
+    fun changeContent(content: String, video: String, pathImage: String, uriImage: String,) {
         val text = content.trim()
         val textVideo = video.trim()
 
@@ -60,23 +61,23 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         val timeFormat: DateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         val timeText: String = timeFormat.format(currentDate)
 
-        if (edited.value?.content == text && edited.value?.video == textVideo && edited.value?.image == uriImage) {
+        if (edited.value?.content == text && edited.value?.video == textVideo && edited.value?.image == pathImage) {
             return
         }
         if (textVideo.equals("")) {
-            if (uriImage.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+            if (pathImage.equals("")){
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
             }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = uriImage)
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = pathImage, imageUri = uriImage)
             }
-        } else if (uriImage.equals("")){
+        } else if (pathImage.equals("")){
             if (textVideo.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
             }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
             }
         } else {
-            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = textVideo, image = uriImage)
+            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = textVideo, image = pathImage, imageUri = uriImage)
         }
     }
 

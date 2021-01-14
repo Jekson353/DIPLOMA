@@ -2,9 +2,10 @@ package com.samoylenko.kt12.activity
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +19,16 @@ import com.samoylenko.kt12.databinding.FragmentPostBinding
 import com.samoylenko.kt12.util.AndroidUtils
 import com.samoylenko.kt12.viewmodel.PostViewModel
 import kotlinx.android.synthetic.main.fragment_post.*
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 
 
 class PostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
-    var tempUriImage = "";
+    var pathUriImage = ""
+    var imgUri = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +47,7 @@ class PostFragment : Fragment() {
         binding.inputUrlVideo.setText(urlVideo)
         if (!image.equals("")) {
             if (image != null) {
-                tempUriImage = image
+                pathUriImage = image
             }
         }
         if (!image.equals("")) {
@@ -60,14 +65,16 @@ class PostFragment : Fragment() {
 
         binding.inputImagePost.setOnClickListener {
             layoutVideo.visibility = View.GONE
-            tempUriImage = ""
+            pathUriImage = ""
             inputImagePost.setImageResource(0)
         }
 
         binding.savePost.setOnClickListener {
             val content = binding.editTextPost.text.toString()
             val urlPost = binding.inputUrlVideo.text.toString()
-            val uriImage = tempUriImage
+            val pathImage = pathUriImage
+            val uriImage = imgUri
+
             if (content.isEmpty()){
                 Toast.makeText(
                     requireActivity(),
@@ -84,7 +91,7 @@ class PostFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.changeContent(content, urlPost, uriImage)
+            viewModel.changeContent(content, urlPost, pathImage, uriImage)
             viewModel.save()
 
             AndroidUtils.hideSoftKeyBoard(requireView())
@@ -107,26 +114,31 @@ class PostFragment : Fragment() {
         when (requestCode) {
             1 -> {
                 if (resultCode == RESULT_OK) {
-                    val chosenImageUri: Uri? = data?.data
+
+                    //получаем имя файла
+                    val uri: Uri? = data?.getData()
+                    val cursor: Cursor? =
+                        uri?.let { context?.getContentResolver()?.query(it, null, null, null, null) }
+                    val nameIndex: Int = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    cursor.moveToFirst()
+                    val filename2 = cursor.getString(nameIndex)
+                    cursor.close();
+
+
                     layoutVideo.visibility = View.VISIBLE
-                    inputImagePost.setImageURI(chosenImageUri)
-
-// video is some file in internal storage
-                    val real_path: String? = chosenImageUri?.getPath()
-                    val auxFile: File = File(real_path.toString())
-                    val filename = auxFile.getName()
+                    inputImagePost.setImageURI(uri)
 
 
-                    val originalFile: InputStream? = chosenImageUri?.let {
+                    //копируем файл во внотреннюю структуру приложения
+                    val originalFile: InputStream? = uri?.let {
                         context?.getContentResolver()?.openInputStream(
                             it
                         )
                     }
-                    val pathFile = context?.filesDir?.resolve(filename)
+                    val pathFile = context?.filesDir?.resolve(filename2)
                     val to: File = pathFile as File
-
-
                     val out: OutputStream = FileOutputStream(to)
+
                     val buf = ByteArray(1024)
                     var len: Int
                     if (originalFile != null) {
@@ -138,10 +150,10 @@ class PostFragment : Fragment() {
                     if (originalFile != null) {
                         originalFile.close()
                     }
-                    tempUriImage = to.absolutePath
+                    pathUriImage = to.absolutePath
+                    imgUri = uri.toString()
 
-                    addImageBtn.setText(tempUriImage)
-
+                    editTextPost.setText(filename2)
 
                 }
             }
