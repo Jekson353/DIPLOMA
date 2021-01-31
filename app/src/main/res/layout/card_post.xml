@@ -82,14 +82,14 @@
         android:layout_margin="16dp"
         android:autoLink="web"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/layoutVideo"
+        app:layout_constraintBottom_toTopOf="@+id/layoutLink"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_Data"
         tools:text="https://www.yandex.ru" />
 
     <FrameLayout
-        android:id="@+id/layoutVideo"
+        android:id="@+id/layoutLink"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -120,7 +120,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="layoutVideo"
+        app:constraint_referenced_ids="layoutLink"
         tools:layout_editor_absoluteY="230dp" />
 
     <ImageButton
@@ -131,7 +131,7 @@
         android:background="@android:color/transparent"
         android:src="@mipmap/ic_like_foreground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutVideo" />
+        app:layout_constraintTop_toBottomOf="@+id/layoutLink" />
 
 
     <ImageButton
@@ -149,17 +149,12 @@
         android:id="@+id/like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
         android:background="@android:color/transparent"
-        android:checkable="true"
         android:contentDescription="@string/text_like"
         android:textColor="@color/black"
-        app:icon="@drawable/selector_like"
-        app:iconTint="@color/like_checkbox_tint_color"
         app:layout_constraintBottom_toBottomOf="@+id/dislike"
         app:layout_constraintStart_toEndOf="@+id/dislike"
         app:layout_constraintTop_toTopOf="@+id/dislike"
-        tools:checkable="true"
         tools:text="@sample/test_data.json/data/likes" />
 
     <com.google.android.material.button.MaterialButton

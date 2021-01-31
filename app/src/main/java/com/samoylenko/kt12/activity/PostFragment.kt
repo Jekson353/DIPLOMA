@@ -1,6 +1,8 @@
 package com.samoylenko.kt12.activity
 
 import android.app.Activity.RESULT_OK
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
@@ -10,7 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -27,8 +31,10 @@ import java.io.OutputStream
 
 class PostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
-    var pathUriImage = ""
-    var imgUri = ""
+    var pathImage = "" //полный путь к изображению
+    var imgUri = "" //переменная для сохранения Uri из прикрепляемого изображения
+    private val REQUEST_CODE_DELETE_IMAGE = 50
+    private val REQUEST_CODE_ADD_IMAGE = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,15 +50,13 @@ class PostFragment : Fragment() {
         val image = arguments?.getString("image")
 
         binding.editTextPost.setText(textPost)
-        binding.inputUrlVideo.setText(urlVideo)
+        binding.inputUrlLink.setText(urlVideo)
         if (!image.equals("")) {
             if (image != null) {
-                pathUriImage = image
+                pathImage = image //при запуске - сохраняем путь в переменную
+                binding.layoutImage.visibility = View.VISIBLE
+                binding.inputImagePost.setImageURI(image.toUri())
             }
-        }
-        if (!image.equals("")) {
-            binding.layoutVideo.visibility = View.VISIBLE
-            binding.inputImagePost.setImageURI(image?.toUri())
         }
         binding.editTextPost.requestFocus()
 
@@ -60,20 +64,21 @@ class PostFragment : Fragment() {
         binding.addImageBtn.setOnClickListener {
             val photoPickerIntent = Intent(Intent.ACTION_GET_CONTENT)
             photoPickerIntent.type = "image/*"
-            startActivityForResult(photoPickerIntent, 1)
+            startActivityForResult(photoPickerIntent, REQUEST_CODE_ADD_IMAGE)
         }
 
         binding.inputImagePost.setOnClickListener {
-            layoutVideo.visibility = View.GONE
-            pathUriImage = ""
-            inputImagePost.setImageResource(0)
+            val manager = this.parentFragmentManager
+            val myDialogFragment = MyDialogFragment()
+
+            myDialogFragment.setTargetFragment(this, REQUEST_CODE_DELETE_IMAGE)
+            myDialogFragment.show(manager, "Выберите действие")
         }
 
         binding.savePost.setOnClickListener {
             val content = binding.editTextPost.text.toString()
-            val urlPost = binding.inputUrlVideo.text.toString()
-            val pathImage = pathUriImage
-            val uriImage = imgUri
+            val urlPost = binding.inputUrlLink.text.toString()
+
 
             if (content.isEmpty()){
                 Toast.makeText(
@@ -91,7 +96,7 @@ class PostFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.changeContent(content, urlPost, pathImage, uriImage)
+            viewModel.changeContent(content, urlPost, pathImage, imgUri)
             viewModel.save()
 
             AndroidUtils.hideSoftKeyBoard(requireView())
@@ -103,8 +108,6 @@ class PostFragment : Fragment() {
 
         }
 
-
-
         return binding.root
     }
 
@@ -112,22 +115,33 @@ class PostFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            1 -> {
+            REQUEST_CODE_DELETE_IMAGE -> {
+                Toast.makeText(
+                    activity, "Изображение удалено",
+                    Toast.LENGTH_LONG
+                ).show()
+                        layoutImage?.visibility = View.GONE
+                        pathImage = ""
+                        inputImagePost?.setImageResource(0)
+                        addImageBtn?.visibility = View.VISIBLE
+            }
+            REQUEST_CODE_ADD_IMAGE -> {
                 if (resultCode == RESULT_OK) {
 
                     //получаем имя файла
                     val uri: Uri? = data?.getData()
                     val cursor: Cursor? =
-                        uri?.let { context?.getContentResolver()?.query(it, null, null, null, null) }
+                        uri?.let {
+                            context?.getContentResolver()?.query(it, null, null, null, null)
+                        }
                     val nameIndex: Int = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     cursor.moveToFirst()
                     val filename2 = cursor.getString(nameIndex)
                     cursor.close();
 
-
-                    layoutVideo.visibility = View.VISIBLE
                     inputImagePost.setImageURI(uri)
-
+                    layoutImage.visibility = View.VISIBLE
+                    addImageBtn.visibility = View.GONE
 
                     //копируем файл во внотреннюю структуру приложения
                     val originalFile: InputStream? = uri?.let {
@@ -150,7 +164,8 @@ class PostFragment : Fragment() {
                     if (originalFile != null) {
                         originalFile.close()
                     }
-                    pathUriImage = to.absolutePath
+                    //при загрузке изображения, меняем путь в переменной, т.к. изображение могло измениться
+                    pathImage = to.absolutePath
                     imgUri = uri.toString()
 
                     editTextPost.setText(filename2)
@@ -159,5 +174,27 @@ class PostFragment : Fragment() {
             }
         }
     }
+}
 
+class MyDialogFragment : DialogFragment() {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return activity?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.setTitle("Подтверждение")
+                .setMessage("Вы действительно желаете удалить изображение?")
+                .setCancelable(true)
+                .setPositiveButton("Да") { dialog, id ->
+                    val intent = Intent()
+                     targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
+                }
+                .setNegativeButton("Нет",
+                    DialogInterface.OnClickListener { dialog, id ->
+                        Toast.makeText(
+                            activity, "Вы отменили операцию",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    })
+            builder.create()
+        } ?: throw IllegalStateException("Activity cannot be null")
+    }
 }

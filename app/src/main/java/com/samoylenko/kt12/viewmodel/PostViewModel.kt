@@ -18,11 +18,9 @@ private val empty = Post(
     published = "",
     sharing = 0,
     like = 0,
-    countVisability = 0,
-    video = "",
+    urlLink = "",
     image = "",
     imageUri = "",
-    likedByMe = false
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -33,7 +31,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val edited = MutableLiveData(empty)
 
     fun onIndexPage() = repository.onIndexPage()
-    fun likeById(id: Long) = repository.likeById(id)
     fun likesById(id: Long) = repository.likesById(id)
     fun dislikeById(id: Long) = repository.dislikeById(id)
     fun shareById(id: Long) = repository.shareById(id)
@@ -47,39 +44,70 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-
-    fun changeContent(content: String, video: String, pathImage: String, uriImage: String,) {
+    fun changeContent(content: String, urlLink: String, pathImage: String, uriImage: String,) {
         val text = content.trim()
-        val textVideo = video.trim()
+        val textUrlLink = urlLink.trim()
 
         // Текущее время
         val currentDate = Date()
-// Форматирование времени как "день.месяц.год"
+        // Форматирование времени как "день.месяц.год"
         val dateFormat: DateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         val dateText: String = dateFormat.format(currentDate)
-// Форматирование времени как "часы:минуты:секунды"
+        // Форматирование времени как "часы:минуты:секунды"
         val timeFormat: DateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         val timeText: String = timeFormat.format(currentDate)
 
-        if (edited.value?.content == text && edited.value?.video == textVideo && edited.value?.image == pathImage) {
+        if (edited.value?.content == text && edited.value?.urlLink == textUrlLink && edited.value?.image == pathImage) {
             return
         }
-        if (textVideo.equals("")) {
+        if (textUrlLink.equals("")) {
             if (pathImage.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = "", imageUri ="")
             }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = pathImage, imageUri = uriImage)
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = pathImage, imageUri = uriImage)
             }
         } else if (pathImage.equals("")){
-            if (textVideo.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
+            if (textUrlLink.equals("")){
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = "", imageUri ="")
             }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "", imageUri ="")
+                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = "", imageUri ="")
             }
         } else {
-            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = textVideo, image = pathImage, imageUri = uriImage)
+            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = textUrlLink, image = pathImage, imageUri = uriImage)
         }
     }
+//    fun changeContent(content: String, video: String, image: String) {
+//        val text = content.trim()
+//        val textVideo = video.trim()
+//
+//        // Текущее время
+//        val currentDate = Date()
+//// Форматирование времени как "день.месяц.год"
+//        val dateFormat: DateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+//        val dateText: String = dateFormat.format(currentDate)
+//// Форматирование времени как "часы:минуты:секунды"
+//        val timeFormat: DateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+//        val timeText: String = timeFormat.format(currentDate)
+//
+//        if (edited.value?.content == text && edited.value?.video == textVideo && edited.value?.image == image) {
+//            return
+//        }
+//        if (textVideo.equals("")) {
+//            if (image.equals("")){
+//                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+//            }else{
+//                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = image)
+//            }
+//        } else if (image.equals("")){
+//            if (textVideo.equals("")){
+//                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+//            }else{
+//                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = "", image = "")
+//            }
+//        } else {
+//            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, video = textVideo, image = image)
+//        }
+//    }
 
     fun edit(post: Post) {
         edited.value = post

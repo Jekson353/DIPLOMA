@@ -13,13 +13,11 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 ${PostColumns.COLUMN_AUTHOR} TEXT NOT NULL,
                 ${PostColumns.COLUMN_CONTENT} TEXT NOT NULL,
                 ${PostColumns.COLUMN_PUBLISHED} TEXT NOT NULL,
-                ${PostColumns.COLUMN_LIKED_BY_ME} BOOLEAN NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_LIKES} INTEGER NOT NULL DEFAULT 0,
-                ${PostColumns.COLUMN_VISABILITY} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_SHARED} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_IMAGE} TEXT DEFAULT "",
                 ${PostColumns.COLUMN_IMAGE_URI} TEXT DEFAULT "",
-                ${PostColumns.COLUMN_URL_VIDEO} TEXT DEFAULT ""
+                ${PostColumns.COLUMN_URL_LINK} TEXT DEFAULT ""
             );
             """.trimIndent()
     }
@@ -30,25 +28,21 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
         const val COLUMN_AUTHOR = "author"
         const val COLUMN_CONTENT = "content"
         const val COLUMN_PUBLISHED = "published"
-        const val COLUMN_LIKED_BY_ME = "likedByMe"
         const val COLUMN_LIKES = "likes"
-        const val COLUMN_VISABILITY = "visability"
         const val COLUMN_SHARED = "shared"
         const val COLUMN_IMAGE = "image"
         const val COLUMN_IMAGE_URI = "imageUri"
-        const val COLUMN_URL_VIDEO = "urlVideo"
+        const val COLUMN_URL_LINK = "urlLink"
         val ALL_COLUMNS = arrayOf(
             COLUMN_ID,
             COLUMN_AUTHOR,
             COLUMN_CONTENT,
             COLUMN_PUBLISHED,
-            COLUMN_LIKED_BY_ME,
             COLUMN_LIKES,
-            COLUMN_VISABILITY,
             COLUMN_SHARED,
             COLUMN_IMAGE,
             COLUMN_IMAGE_URI,
-            COLUMN_URL_VIDEO
+            COLUMN_URL_LINK
         )
     }
 
@@ -68,17 +62,6 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             }
         }
         return posts
-    }
-
-    override fun likeById(id: Long) {
-        db.execSQL(
-            """
-                UPDATE posts SET
-                    likes = likes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
-                    likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
-                WHERE id = ?;
-            """.trimIndent(), arrayOf(id)
-        )
     }
 
     override fun likesById(id: Long) {
@@ -119,13 +102,11 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             put(PostColumns.COLUMN_AUTHOR, "Локальное сохранение")
             put(PostColumns.COLUMN_CONTENT, post.content)
             put(PostColumns.COLUMN_PUBLISHED, post.published)
-            put(PostColumns.COLUMN_LIKED_BY_ME, post.likedByMe)
             put(PostColumns.COLUMN_LIKES, post.like)
-            put(PostColumns.COLUMN_VISABILITY, post.countVisability)
             put(PostColumns.COLUMN_SHARED, post.sharing)
             put(PostColumns.COLUMN_IMAGE, post.image)
             put(PostColumns.COLUMN_IMAGE_URI, post.imageUri)
-            put(PostColumns.COLUMN_URL_VIDEO, post.video)
+            put(PostColumns.COLUMN_URL_LINK, post.urlLink)
         }
         val id = db.replace(PostColumns.TABLE, null, values)
         db.query(
@@ -157,13 +138,11 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 author = getString(getColumnIndexOrThrow(PostColumns.COLUMN_AUTHOR)),
                 content = getString(getColumnIndexOrThrow(PostColumns.COLUMN_CONTENT)),
                 published = getString(getColumnIndexOrThrow(PostColumns.COLUMN_PUBLISHED)),
-                likedByMe = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKED_BY_ME)) !=0,
                 like = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
-                countVisability = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_VISABILITY)),
                 sharing = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_SHARED)),
                 image = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE)),
                 imageUri = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE_URI)),
-                video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_URL_VIDEO))
+                urlLink = getString(getColumnIndexOrThrow(PostColumns.COLUMN_URL_LINK))
             )
         }
     }

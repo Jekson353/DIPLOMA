@@ -7,9 +7,7 @@ data class Post (
     val published: String,
     val sharing: Int,
     val like: Int,
-    var countVisability: Int,
-    val video: String,
+    val urlLink: String,
     val image: String,
-    val imageUri: String,
-    val likedByMe: Boolean = false
+    val imageUri: String
 )

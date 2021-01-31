@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,6 +15,7 @@ import com.samoylenko.kt12.adapter.PostAdapter
 import com.samoylenko.kt12.databinding.FragmentFeedBinding
 import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.viewmodel.PostViewModel
+import java.io.File
 
 
 class FeedFragment : Fragment() {
@@ -52,12 +54,9 @@ class FeedFragment : Fragment() {
                 viewModel.edit(post)
             }
 
-            override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
-            }
-
             override fun onLikes(post: Post) {
                 viewModel.likesById(post.id)
+
             }
 
             override fun onRemove(post: Post) {
@@ -82,18 +81,16 @@ class FeedFragment : Fragment() {
                 bundle.putString("author", post.author)
                 bundle.putString("txtDate", post.published)
                 bundle.putString("content", post.content)
-                bundle.putInt("visability", post.countVisability)
                 bundle.putInt("like", post.like)
                 bundle.putInt("share", post.sharing)
                 bundle.putString("image", post.image)
-                bundle.putString("video", post.video)
-                bundle.putBoolean("likedByMe", post.likedByMe)
+                bundle.putString("urlLink", post.urlLink)
                 bundle.putString("imageUri", post.imageUri)
                 findNavController().navigate(R.id.action_feedFragment_to_onePostFragment, bundle)
             }
 
             override fun playVideo(post: Post) {
-                Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
+                Intent(Intent.ACTION_VIEW, Uri.parse(post.urlLink))
                     .also {
                         if (it.resolveActivity(requireActivity().packageManager) == null) {
                             Toast.makeText(
@@ -108,9 +105,23 @@ class FeedFragment : Fragment() {
             }
 
             override fun onShare(post: Post) {
-                Intent(Intent.ACTION_SEND)
-                    .putExtra(Intent.EXTRA_TEXT, post.content)
-                    .setType("text/plain")
+                val intent = Intent(Intent.ACTION_SEND)
+                if (!post.image.equals("")){
+                    val file = File (post.image)
+                    val myPhotoFileUri = FileProvider.getUriForFile(
+                        requireActivity(),
+                        requireActivity().applicationContext.packageName + ".provider",
+                        file
+                    )
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.putExtra(Intent.EXTRA_STREAM, myPhotoFileUri)
+                    intent.setType("image/*")
+                }else{
+                    intent.setType("text/plain")
+                }
+                val textToShare = post.author + "\n" + post.content
+
+                intent.putExtra(Intent.EXTRA_TEXT, textToShare)
                     .also {
                         if (it.resolveActivity(requireActivity().packageManager) == null) {
                             Toast.makeText(
@@ -120,7 +131,7 @@ class FeedFragment : Fragment() {
                             ).show()
                         } else {
                             viewModel.shareById(post.id)
-                            startActivity(it)
+                            startActivity(Intent.createChooser(intent, "Поделиться с помощью:"))
                         }
                     }
             }
@@ -128,7 +139,7 @@ class FeedFragment : Fragment() {
 
         binding.listItem.adapter = adapter
         viewModel.data.observe(viewLifecycleOwner, { posts ->
-            adapter.submitList(posts)
+            adapter.submitList(posts.sortedByDescending { post -> post.like })
         })
 
         binding.addPostButton.setOnClickListener {
@@ -141,7 +152,7 @@ class FeedFragment : Fragment() {
             }
             val bundle = Bundle()
             bundle.putString("textPost", post.content)
-            bundle.putString("urlVideo", post.video)
+            bundle.putString("urlLink", post.urlLink)
             bundle.putString("image", post.image)
 
             findNavController().navigate(R.id.action_feedFragment_to_postFragment, bundle)

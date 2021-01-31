@@ -16,7 +16,6 @@ import com.samoylenko.kt12.util.Calc
 
 
 interface OnInteractionListener {
-    fun onLike(post: Post) {}
     fun onLikes(post: Post) {}
     fun onDislike(post: Post) {}
     fun onIndexPage() {}
@@ -63,7 +62,6 @@ class PostViewHolder(
             author.text = post.author
             txtDate.text = post.published
             textData.text = post.content
-            //visability.text = post.countVisability.toString()
             if (post.like<0){
                 like.setTextColor(Color.parseColor("#FF0000"))
             }else if (post.like>0){
@@ -73,33 +71,15 @@ class PostViewHolder(
             }
             like.text = Calc.intToText(post.like)
             share.text = post.sharing.toString()
-            like.isChecked = post.likedByMe
-//            if (!post.video.equals("")) {
-//                layoutVideo.visibility = View.VISIBLE
-//                //videoViewPlay.text = post.video
-//            }
-            if (!post.video.equals("")){
+            if (!post.urlLink.equals("")){
                 urlLink.visibility = View.VISIBLE
-                urlLink.setText(post.video)
-                //layoutVideo.visibility = View.VISIBLE
-
+                urlLink.setText(post.urlLink)
             }
             if (!post.image.equals("")) {
-                layoutVideo.visibility = View.VISIBLE
+                layoutLink.visibility = View.VISIBLE
                 inputImagePost.setImageURI(post.image.toUri())
-//                val imgFile = File(post.image)
-//                if (imgFile.exists()) {
-//                    val myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
-//                    //val myImage: ImageView = findViewById(R.id.imageviewTest) as ImageView
-//                    inputImagePost.setImageBitmap(myBitmap)
-//                }else{
-//                    author.text = "Картинка не найдена"
-//                }
             }
 
-            like.setOnClickListener {
-                onInteractionListener.onLike(post)
-            }
             share.setOnClickListener {
                 onInteractionListener.onShare(post)
             }
