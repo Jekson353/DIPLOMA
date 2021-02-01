@@ -134,14 +134,14 @@ class PostFragment : Fragment() {
                     val nameIndex: Int = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     cursor.moveToFirst()
                     val filename2 = cursor.getString(nameIndex)
-                    cursor.close();
+                    cursor.close()
 
                     inputImagePost.setImageURI(uri)
                     layoutImage.visibility = View.VISIBLE
                     addImageBtn.visibility = View.GONE
 
                     //копируем файл во внотреннюю структуру приложения
-                    val originalFile: InputStream? = uri?.let {
+                    val originalFile: InputStream? = uri.let {
                         context?.getContentResolver()?.openInputStream(
                             it
                         )
@@ -163,9 +163,6 @@ class PostFragment : Fragment() {
                     }
                     //при загрузке изображения, меняем путь в переменной, т.к. изображение могло измениться
                     pathImage = to.absolutePath
-
-                    editTextPost.setText(filename2)
-
                 }
             }
         }
