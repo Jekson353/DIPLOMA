@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/postID"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -99,21 +99,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/urlLink">
 
-
-
         <ImageView
             android:id="@+id/inputImagePost"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_margin="16dp"
             android:adjustViewBounds="true"
-            android:elevation="4dp"
-            android:layout_gravity="center"
             android:contentDescription="@string/image_description"
-            tools:srcCompat="@android:drawable/ic_dialog_info"/>
-
+            android:elevation="4dp"
+            tools:srcCompat="@android:drawable/ic_dialog_info" />
     </FrameLayout>
-
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_end"
@@ -173,8 +169,6 @@
         app:layout_constraintVertical_bias="0.0"
         tools:checkable="true"
         tools:text="@sample/test_data.json/data/shares" />
-
-
 
     <View
         android:id="@+id/divider"

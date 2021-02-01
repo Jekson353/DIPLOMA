@@ -9,5 +9,5 @@ data class Post (
     val like: Int,
     val urlLink: String,
     val image: String,
-    val imageUri: String
+    //val imageUri: String
 )

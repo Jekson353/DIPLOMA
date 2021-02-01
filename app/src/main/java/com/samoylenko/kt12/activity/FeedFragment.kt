@@ -32,11 +32,14 @@ class FeedFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.getItemId()
 
+        if (id == R.id.demo_data) {
+            viewModel.getDemoData(this.requireContext())
+        }
         if (id == R.id.index_page) {
             viewModel.onIndexPage()
         }
         if (id == R.id.about) {
-            Toast.makeText(requireActivity(), "О приложении", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), getString(R.string.about_app), Toast.LENGTH_LONG).show()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -56,7 +59,6 @@ class FeedFragment : Fragment() {
 
             override fun onLikes(post: Post) {
                 viewModel.likesById(post.id)
-
             }
 
             override fun onRemove(post: Post) {
@@ -85,17 +87,23 @@ class FeedFragment : Fragment() {
                 bundle.putInt("share", post.sharing)
                 bundle.putString("image", post.image)
                 bundle.putString("urlLink", post.urlLink)
-                bundle.putString("imageUri", post.imageUri)
                 findNavController().navigate(R.id.action_feedFragment_to_onePostFragment, bundle)
             }
 
-            override fun playVideo(post: Post) {
-                Intent(Intent.ACTION_VIEW, Uri.parse(post.urlLink))
+            override fun goToUrl(post: Post) {
+                var url = post.urlLink
+                if (!url.equals("")){
+                    if (!url.startsWith("http://") && !url.startsWith("https://")){
+                        url = "http://" + url
+                    }
+                }
+
+                Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     .also {
                         if (it.resolveActivity(requireActivity().packageManager) == null) {
                             Toast.makeText(
                                 requireActivity(),
-                                "Нет приложений для просмотра видео",
+                                getString(R.string.no_app_url),
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -126,12 +134,12 @@ class FeedFragment : Fragment() {
                         if (it.resolveActivity(requireActivity().packageManager) == null) {
                             Toast.makeText(
                                 requireActivity(),
-                                "Нет приложений для отправки сообщений",
+                                R.string.no_app_share,
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
                             viewModel.shareById(post.id)
-                            startActivity(Intent.createChooser(intent, "Поделиться с помощью:"))
+                            startActivity(Intent.createChooser(intent, getString(R.string.share_from_help)))
                         }
                     }
             }
@@ -157,7 +165,6 @@ class FeedFragment : Fragment() {
 
             findNavController().navigate(R.id.action_feedFragment_to_postFragment, bundle)
         })
-
 
         return binding.root
     }

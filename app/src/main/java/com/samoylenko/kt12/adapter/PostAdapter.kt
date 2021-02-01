@@ -22,7 +22,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
-    fun playVideo(post: Post) {}
+    fun goToUrl(post: Post) {}
     fun onClickPost(post: Post) {}
     fun onAuthor(post: Post){}
 }
@@ -117,7 +117,7 @@ class PostViewHolder(
                 }.show()
             }
             inputImagePost.setOnClickListener {
-                onInteractionListener.playVideo(post)
+                onInteractionListener.goToUrl(post)
             }
 
             binding.root.setOnClickListener {

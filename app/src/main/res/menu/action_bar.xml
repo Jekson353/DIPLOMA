@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_one"
+        android:id="@+id/demo_data"
         android:icon="@drawable/ic_play_24"
         app:showAsAction="always"
-        android:title="Item One"/>
+        android:title="@string/load_demo"/>
 
-    <item android:id="@+id/index_page" android:title="Главная" />
-    <item android:id="@+id/about" android:title="О приложении" />
+    <item android:id="@+id/index_page" android:title="@string/index_page" />
+    <item android:id="@+id/about" android:title="@string/about" />
 </menu>

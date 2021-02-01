@@ -17,4 +17,20 @@
     <string name="text_enter_video">Введите ссылку</string>
     <string name="addImage">Добавить картинку</string>
     <string name="image_description">Image</string>
+    <string name="share_from_help">Поделиться с помощью:</string>
+    <string name="no_app_share">Нет приложений для отправки сообщений</string>
+    <string name="select_action">Выберите действие</string>
+    <string name="text_no_empty">Текст не может быть пустым</string>
+    <string name="delete_image">Изображение удалено</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="cancel_operation">Вы отменили операцию</string>
+    <string name="confirmation">Подтверждение</string>
+    <string name="sure_deleted">Вы действительно желаете удалить изображение?</string>
+    <string name="index_page">Главная</string>
+    <string name="about">О приложении</string>
+    <string name="load_demo">ДЕМО ДАННЫЕ</string>
+    <string name="all_post_author">Все посты автора</string>
+    <string name="no_app_url">Нет приложений для показа ссылки</string>
+    <string name="about_app">Версия 1.0. Автор Самойленко А.С.</string>
 </resources>

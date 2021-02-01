@@ -16,7 +16,6 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 ${PostColumns.COLUMN_LIKES} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_SHARED} INTEGER NOT NULL DEFAULT 0,
                 ${PostColumns.COLUMN_IMAGE} TEXT DEFAULT "",
-                ${PostColumns.COLUMN_IMAGE_URI} TEXT DEFAULT "",
                 ${PostColumns.COLUMN_URL_LINK} TEXT DEFAULT ""
             );
             """.trimIndent()
@@ -31,7 +30,6 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
         const val COLUMN_LIKES = "likes"
         const val COLUMN_SHARED = "shared"
         const val COLUMN_IMAGE = "image"
-        const val COLUMN_IMAGE_URI = "imageUri"
         const val COLUMN_URL_LINK = "urlLink"
         val ALL_COLUMNS = arrayOf(
             COLUMN_ID,
@@ -41,7 +39,6 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             COLUMN_LIKES,
             COLUMN_SHARED,
             COLUMN_IMAGE,
-            COLUMN_IMAGE_URI,
             COLUMN_URL_LINK
         )
     }
@@ -96,16 +93,19 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
 
     override fun save(post: Post): Post {
         val values = ContentValues().apply {
-            if (post.id !=0L){
+            if (post.id != 0L) {
                 put(PostColumns.COLUMN_ID, post.id)
             }
-            put(PostColumns.COLUMN_AUTHOR, "Локальное сохранение")
+            if (!post.author.equals("")) {
+                put(PostColumns.COLUMN_AUTHOR, post.author)
+            } else {
+                put(PostColumns.COLUMN_AUTHOR, "Локальное сохранение")
+            }
             put(PostColumns.COLUMN_CONTENT, post.content)
             put(PostColumns.COLUMN_PUBLISHED, post.published)
             put(PostColumns.COLUMN_LIKES, post.like)
             put(PostColumns.COLUMN_SHARED, post.sharing)
             put(PostColumns.COLUMN_IMAGE, post.image)
-            put(PostColumns.COLUMN_IMAGE_URI, post.imageUri)
             put(PostColumns.COLUMN_URL_LINK, post.urlLink)
         }
         val id = db.replace(PostColumns.TABLE, null, values)
@@ -117,7 +117,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             null,
             null,
             null,
-        ).use{
+        ).use {
             it.moveToNext()
             return map(it)
         }
@@ -131,8 +131,8 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
         )
     }
 
-    private fun map(cursor: Cursor): Post{
-        with(cursor){
+    private fun map(cursor: Cursor): Post {
+        with(cursor) {
             return Post(
                 id = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_ID)),
                 author = getString(getColumnIndexOrThrow(PostColumns.COLUMN_AUTHOR)),
@@ -141,7 +141,6 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
                 like = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
                 sharing = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_SHARED)),
                 image = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE)),
-                imageUri = getString(getColumnIndexOrThrow(PostColumns.COLUMN_IMAGE_URI)),
                 urlLink = getString(getColumnIndexOrThrow(PostColumns.COLUMN_URL_LINK))
             )
         }

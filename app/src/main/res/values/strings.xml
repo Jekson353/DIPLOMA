@@ -16,4 +16,20 @@
     <string name="text_enter_video">Enter URL</string>
     <string name="addImage">Edd Image</string>
     <string name="image_description">Image</string>
+    <string name="share_from_help">Share with:</string>
+    <string name="no_app_share">No apps to send messages</string>
+    <string name="select_action">Select an action</string>
+    <string name="text_no_empty">Text cannot be empty</string>
+    <string name="delete_image">Picture deleted</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel_operation">You canceled the transaction</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="sure_deleted">Are you sure you want to delete the image?</string>
+    <string name="index_page">Home page</string>
+    <string name="about">About app</string>
+    <string name="load_demo">LOAD DEMO</string>
+    <string name="all_post_author">All posts author</string>
+    <string name="no_app_url">No app for open URL</string>
+    <string name="about_app">Version 1.0 by Samoylenko A.S.</string>
 </resources>

@@ -2,7 +2,6 @@ package com.samoylenko.kt12.activity
 
 import android.app.Activity.RESULT_OK
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
@@ -32,7 +31,6 @@ import java.io.OutputStream
 class PostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
     var pathImage = "" //полный путь к изображению
-    var imgUri = "" //переменная для сохранения Uri из прикрепляемого изображения
     private val REQUEST_CODE_DELETE_IMAGE = 50
     private val REQUEST_CODE_ADD_IMAGE = 1
 
@@ -45,12 +43,12 @@ class PostFragment : Fragment() {
         val binding = FragmentPostBinding.inflate(inflater, container, false)
 
         val textPost = arguments?.getString("textPost")
-        val urlVideo = arguments?.getString("urlVideo")
+        val urlLink = arguments?.getString("urlLink")
         val owner = arguments?.getString("owner")
         val image = arguments?.getString("image")
 
         binding.editTextPost.setText(textPost)
-        binding.inputUrlLink.setText(urlVideo)
+        binding.inputUrlLink.setText(urlLink)
         if (!image.equals("")) {
             if (image != null) {
                 pathImage = image //при запуске - сохраняем путь в переменную
@@ -72,7 +70,7 @@ class PostFragment : Fragment() {
             val myDialogFragment = MyDialogFragment()
 
             myDialogFragment.setTargetFragment(this, REQUEST_CODE_DELETE_IMAGE)
-            myDialogFragment.show(manager, "Выберите действие")
+            myDialogFragment.show(manager, getString(R.string.select_action))
         }
 
         binding.savePost.setOnClickListener {
@@ -83,7 +81,7 @@ class PostFragment : Fragment() {
             if (content.isEmpty()){
                 Toast.makeText(
                     requireActivity(),
-                    "Текст не может быть пустым",
+                    getString(R.string.text_no_empty),
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
@@ -96,7 +94,7 @@ class PostFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.changeContent(content, urlPost, pathImage, imgUri)
+            viewModel.changeContent(content, urlPost, pathImage)
             viewModel.save()
 
             AndroidUtils.hideSoftKeyBoard(requireView())
@@ -111,19 +109,18 @@ class PostFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_CODE_DELETE_IMAGE -> {
                 Toast.makeText(
-                    activity, "Изображение удалено",
+                    activity, getString(R.string.delete_image),
                     Toast.LENGTH_LONG
                 ).show()
-                        layoutImage?.visibility = View.GONE
-                        pathImage = ""
-                        inputImagePost?.setImageResource(0)
-                        addImageBtn?.visibility = View.VISIBLE
+                layoutImage?.visibility = View.GONE
+                pathImage = ""
+                inputImagePost?.setImageResource(0)
+                addImageBtn?.visibility = View.VISIBLE
             }
             REQUEST_CODE_ADD_IMAGE -> {
                 if (resultCode == RESULT_OK) {
@@ -166,7 +163,6 @@ class PostFragment : Fragment() {
                     }
                     //при загрузке изображения, меняем путь в переменной, т.к. изображение могло измениться
                     pathImage = to.absolutePath
-                    imgUri = uri.toString()
 
                     editTextPost.setText(filename2)
 
@@ -180,20 +176,19 @@ class MyDialogFragment : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
-            builder.setTitle("Подтверждение")
-                .setMessage("Вы действительно желаете удалить изображение?")
+            builder.setTitle(getString(R.string.confirmation))
+                .setMessage(getString(R.string.sure_deleted))
                 .setCancelable(true)
-                .setPositiveButton("Да") { dialog, id ->
+                .setPositiveButton(getString(R.string.yes)) { dialog, id ->
                     val intent = Intent()
                      targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
                 }
-                .setNegativeButton("Нет",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        Toast.makeText(
-                            activity, "Вы отменили операцию",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    })
+                .setNegativeButton(getString(R.string.no)) { dialog, id ->
+                    Toast.makeText(
+                        activity, getString(R.string.cancel_operation),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
