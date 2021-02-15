@@ -1,10 +1,12 @@
 package com.samoylenko.kt12.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -51,6 +53,7 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         val adapter = PostAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
@@ -138,10 +141,14 @@ class FeedFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            viewModel.shareById(post.id)
-                            startActivity(Intent.createChooser(intent, getString(R.string.share_from_help)))
+                            startActivity(Intent.createChooser(intent, getString(R.string.share_from_help))).also { result ->
+                                viewModel.shareById(post.id)
+                            }
                         }
                     }
+//                    .apply {
+//                        viewModel.shareById(post.id)
+//                    }
             }
         })
 

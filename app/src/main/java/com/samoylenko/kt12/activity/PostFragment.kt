@@ -11,7 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -39,9 +41,9 @@ class PostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val binding = FragmentPostBinding.inflate(inflater, container, false)
 
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val textPost = arguments?.getString("textPost")
         val urlLink = arguments?.getString("urlLink")
         val owner = arguments?.getString("owner")
@@ -56,7 +58,36 @@ class PostFragment : Fragment() {
                 binding.inputImagePost.setImageURI(image.toUri())
             }
         }
-        binding.editTextPost.requestFocus()
+        //binding.editTextPost.requestFocus()
+
+
+        val callback = object : OnBackPressedCallback(
+            true
+        ) {
+            override fun handleOnBackPressed() {
+                if (owner.equals("onePost")) {
+                    viewModel.noSave()
+                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Отменено",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return
+                } else {
+                    viewModel.noSave()
+                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "noSave()",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return
+                }
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
 
         binding.addImageBtn.setOnClickListener {
@@ -78,14 +109,14 @@ class PostFragment : Fragment() {
             val urlPost = binding.inputUrlLink.text.toString()
 
 
-            if (content.isEmpty()){
+            if (content.isEmpty()) {
                 Toast.makeText(
                     requireActivity(),
                     getString(R.string.text_no_empty),
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
-            }else if (content.length > 100){
+            } else if (content.length > 100) {
                 Toast.makeText(
                     requireActivity(),
                     "Количество символов не более 100. Сейчас их ${content.length}",
@@ -98,9 +129,9 @@ class PostFragment : Fragment() {
             viewModel.save()
 
             AndroidUtils.hideSoftKeyBoard(requireView())
-            if(owner.equals("onePost")){
+            if (owner.equals("onePost")) {
                 findNavController().navigate(R.id.action_postFragment_to_feedFragment)
-            }else{
+            } else {
                 findNavController().navigateUp()
             }
 
@@ -163,6 +194,7 @@ class PostFragment : Fragment() {
                     }
                     //при загрузке изображения, меняем путь в переменной, т.к. изображение могло измениться
                     pathImage = to.absolutePath
+                    editTextPost.requestFocus()
                 }
             }
         }
@@ -170,7 +202,7 @@ class PostFragment : Fragment() {
 }
 
 class MyDialogFragment : DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             builder.setTitle(getString(R.string.confirmation))
@@ -178,7 +210,7 @@ class MyDialogFragment : DialogFragment() {
                 .setCancelable(true)
                 .setPositiveButton(getString(R.string.yes)) { dialog, id ->
                     val intent = Intent()
-                     targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
+                    targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
                 }
                 .setNegativeButton(getString(R.string.no)) { dialog, id ->
                     Toast.makeText(

@@ -160,7 +160,7 @@
         android:background="@android:color/transparent"
         android:checkable="true"
         android:contentDescription="@string/text_like"
-        android:textColor="@color/black"
+        android:textColor="@android:color/transparent"
         app:icon="@drawable/ic_baseline_share_24"
         app:iconTint="@color/grey"
         app:layout_constraintBottom_toBottomOf="@+id/like"

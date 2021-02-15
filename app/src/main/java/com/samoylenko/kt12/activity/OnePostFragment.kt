@@ -1,17 +1,17 @@
 package com.samoylenko.kt12.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.PopupMenu
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.samoylenko.kt12.R
@@ -23,13 +23,54 @@ import java.io.File
 class OnePostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
     var posts: Post? = null
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.toolbar_one_post, menu);
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.getItemId()
+
+        if (id == R.id.deleteView) {
+            if (posts?.id != null) {
+                viewModel.removeById(posts!!.id)
+                Toast.makeText(
+                    requireActivity(),
+                    "Удалено",
+                    Toast.LENGTH_SHORT
+                ).show()
+                findNavController().navigateUp()
+            }
+        }
+        if (id == R.id.editView) {
+            if (posts?.id != null) {
+                viewModel.edit(posts!!)
+                val bundle = Bundle()
+                bundle.putString("textPost", posts?.content)
+                bundle.putString("urlLink", posts?.urlLink)
+                bundle.putString("image", posts?.image)
+                bundle.putString("owner", "onePost") //для определения логики навигации
+
+                findNavController().navigate(
+                    R.id.action_onePostFragment_to_postFragment,
+                    bundle
+                )
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        setHasOptionsMenu(true)
+
         val binding = CardPostBinding.inflate(inflater, container, false)
         val postId = arguments?.getLong("idPost")
-
         val onePost: Post? = postId?.let {
             Post(
                 id = it,
@@ -61,49 +102,46 @@ class OnePostFragment : Fragment() {
             }
         }
 
-
-        binding.menu.setOnClickListener {
-            PopupMenu(it.context, it).apply {
-                inflate(R.menu.options_post)
-                setOnMenuItemClickListener { itemView ->
-                    when (itemView.itemId) {
-                        R.id.deleteView -> {
-                            if (postId != null) {
-                                viewModel.removeById(postId)
-                                findNavController().navigateUp()
-                            }
-                            true
-                        }
-                        R.id.viewPostAuthor -> {
-                            if (onePost != null) {
-                                viewModel.viewByAuthor(onePost.author)
-                            }
-                            findNavController().navigateUp()
-                            true
-                        }
-                        R.id.editView -> {
-                            if (onePost != null) {
-                                viewModel.edit(onePost)
-                                val bundle = Bundle()
-                                bundle.putString("textPost", onePost.content)
-                                bundle.putString("urlLink", onePost.urlLink)
-                                bundle.putString("image", onePost.image)
-                                bundle.putString(
-                                    "owner",
-                                    "onePost"
-                                ) //для определения логики навигации
-                                findNavController().navigate(
-                                    R.id.action_onePostFragment_to_postFragment,
-                                    bundle
-                                )
-                            }
-                            true
-                        }
-                        else -> false
-                    }
-                }
-            }.show()
-        }
+        binding.menu.visibility = View.GONE
+//        binding.menu.setOnClickListener {
+//            PopupMenu(it.context, it).apply {
+//                inflate(R.menu.options_post)
+//                setOnMenuItemClickListener { itemView ->
+//                    when (itemView.itemId) {
+//                        R.id.deleteView -> {
+//                            if (postId != null) {
+//                                viewModel.removeById(postId)
+//                                findNavController().navigateUp()
+//                            }
+//                            true
+//                        }
+//                        R.id.viewPostAuthor -> {
+//                            if (onePost != null) {
+//                                viewModel.viewByAuthor(onePost.author)
+//                            }
+//                            findNavController().navigateUp()
+//                            true
+//                        }
+//                        R.id.editView -> {
+//                            if (onePost != null) {
+//                                viewModel.edit(onePost)
+//                                val bundle = Bundle()
+//                                bundle.putString("textPost", onePost.content)
+//                                bundle.putString("urlLink", onePost.urlLink)
+//                                bundle.putString("image", onePost.image)
+//                                bundle.putString("owner", "onePost") //для определения логики навигации
+//                                findNavController().navigate(
+//                                    R.id.action_onePostFragment_to_postFragment,
+//                                    bundle
+//                                )
+//                            }
+//                            true
+//                        }
+//                        else -> false
+//                    }
+//                }
+//            }.show()
+//        }
 
         binding.share.setOnClickListener {
             if (onePost != null) {
@@ -144,14 +182,14 @@ class OnePostFragment : Fragment() {
         view?.isVisible = false
 
         binding.imgAvatar.setImageResource(R.drawable.icon_app)
-        binding.author.text = onePost!!.author
-        binding.txtDate.text = onePost.published
-        binding.textData.text = onePost.content
-        binding.like.text = onePost.like.toString()
-        binding.share.text = onePost.sharing.toString()
-        if (!onePost.image.equals("")) {
+        binding.author.text = onePost?.author
+        binding.txtDate.text = onePost?.published
+        binding.textData.text = onePost?.content
+        binding.like.text = onePost?.like.toString()
+        binding.share.text = onePost?.sharing.toString()
+        if (!onePost?.image.equals("")) {
             binding.layoutLink.visibility = View.VISIBLE
-            binding.inputImagePost.setImageURI(onePost.image.toUri())
+            binding.inputImagePost.setImageURI(onePost?.image?.toUri())
         }
 
         return binding.root

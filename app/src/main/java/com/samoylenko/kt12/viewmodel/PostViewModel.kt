@@ -43,6 +43,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
         edited.value = empty
     }
+    fun noSave() {
+        edited.value = empty
+    }
 
 
     fun changeContent(content: String, urlLink: String, pathImage: String) {
@@ -61,20 +64,34 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         if (edited.value?.content == text && edited.value?.urlLink == textUrlLink && edited.value?.image == pathImage) {
             return
         }
-        if (textUrlLink.equals("")) {
-            if (pathImage.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = "")
-            }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = pathImage)
-            }
-        } else if (pathImage.equals("")){
-            if (textUrlLink.equals("")){
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = "", image = "")
-            }else{
-                edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = textUrlLink, image = "")
-            }
+        if (textUrlLink.equals("") && pathImage.equals("")) {
+            edited.value = edited.value?.copy(
+                published = dateText + ' ' + timeText,
+                content = text,
+                urlLink = "",
+                image = ""
+            )
+        } else if (pathImage.equals("") && !textUrlLink.equals("")) {
+            edited.value = edited.value?.copy(
+                published = dateText + ' ' + timeText,
+                content = text,
+                urlLink = textUrlLink,
+                image = ""
+            )
+        } else if (!pathImage.equals("") && textUrlLink.equals("")) {
+            edited.value = edited.value?.copy(
+                published = dateText + ' ' + timeText,
+                content = text,
+                urlLink = "",
+                image = pathImage
+            )
         } else {
-            edited.value = edited.value?.copy(published = dateText +' '+ timeText, content = text, urlLink = textUrlLink, image = pathImage)
+            edited.value = edited.value?.copy(
+                published = dateText + ' ' + timeText,
+                content = text,
+                urlLink = textUrlLink,
+                image = pathImage
+            )
         }
     }
 
