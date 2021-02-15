@@ -17,12 +17,13 @@ object Calc {
             else -> return "Более 1 Billion"
         }
     }
+
     fun calcLike(like: Int, places: Int): String {
         //при больших цифрах, отображаемое округление уже не настолько важно
         val df: DecimalFormat
-        if (places==1){
+        if (places == 1) {
             df = DecimalFormat("###.#")
-        }else{
+        } else {
             df = DecimalFormat("###")
         }
         val liked: Double

@@ -18,13 +18,12 @@ import com.samoylenko.kt12.util.Calc
 interface OnInteractionListener {
     fun onLikes(post: Post) {}
     fun onDislike(post: Post) {}
-    fun onIndexPage() {}
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
     fun goToUrl(post: Post) {}
     fun onClickPost(post: Post) {}
-    fun onAuthor(post: Post){}
+    fun onAuthor(post: Post) {}
 }
 
 class PostAdapter(
@@ -62,16 +61,16 @@ class PostViewHolder(
             author.text = post.author
             txtDate.text = post.published
             textData.text = post.content
-            if (post.like<0){
+            if (post.like < 0) {
                 like.setTextColor(Color.parseColor("#FF0000"))
-            }else if (post.like>0){
+            } else if (post.like > 0) {
                 like.setTextColor(Color.parseColor("#4CAF50"))
-            }else{
+            } else {
                 like.setTextColor(Color.parseColor("#9C9B9B"))
             }
             like.text = Calc.intToText(post.like)
             share.text = post.sharing.toString()
-            if (!post.urlLink.equals("")){
+            if (!post.urlLink.equals("")) {
                 urlLink.visibility = View.VISIBLE
                 urlLink.setText(post.urlLink)
             }
@@ -105,10 +104,6 @@ class PostViewHolder(
                             }
                             R.id.viewPostAuthor -> {
                                 onInteractionListener.onAuthor(post)
-                                true
-                            }
-                            R.id.index_page -> {
-                                onInteractionListener.onIndexPage()
                                 true
                             }
                             else -> false

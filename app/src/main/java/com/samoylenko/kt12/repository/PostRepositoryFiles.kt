@@ -100,8 +100,8 @@ class PostRepositorySQLiteImpl(
     }
 
 
-//хардкодинг данных. И пересохранение файла из Drawable внутрь приложения...
-    fun demoToSQL(context: Context): List<Post>{
+    //хардкодинг данных. И пересохранение файла из Drawable внутрь приложения...
+    fun demoToSQL(context: Context): List<Post> {
         val uri1: Uri = Uri.parse("android.resource://com.samoylenko.kt12/drawable/demo1")
         val uri2: Uri = Uri.parse("android.resource://com.samoylenko.kt12/drawable/demo2")
 
@@ -167,10 +167,10 @@ class PostRepositorySQLiteImpl(
                 image = uri1.toString()
             ),
 
-        )
+            )
         var i = 0
         val p = demoPosts.size
-        while (i<p){
+        while (i < p) {
             val pathImage = saveFile(demoPosts[i].image.toUri(), context)
             dao.save(demoPosts[i].copy(author = demoPosts[i].author, image = pathImage))
             i++
@@ -178,12 +178,12 @@ class PostRepositorySQLiteImpl(
         return demoPosts
     }
 
-    fun saveFile(uri: Uri, context: Context): String{
-        var filename2 = ""
+    fun saveFile(uri: Uri, context: Context): String {
+        val filename2: String
         val name = uri.path
-        if (name.equals("/drawable/demo1")){
+        if (name.equals("/drawable/demo1")) {
             filename2 = "demo1.jpg"
-        }else{
+        } else {
             filename2 = "demo2.jpg"
         }
 
@@ -201,6 +201,6 @@ class PostRepositorySQLiteImpl(
         }
         out.close()
         inputStream?.close()
-       return to.absolutePath
+        return to.absolutePath
     }
 }

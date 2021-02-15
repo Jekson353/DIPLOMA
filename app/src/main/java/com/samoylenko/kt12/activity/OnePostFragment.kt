@@ -1,6 +1,5 @@
 package com.samoylenko.kt12.activity
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
 import android.os.Bundle
@@ -11,7 +10,6 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.samoylenko.kt12.R
@@ -25,7 +23,7 @@ class OnePostFragment : Fragment() {
     var posts: Post? = null
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbar_one_post, menu);
+        inflater.inflate(R.menu.toolbar_one_post, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -37,7 +35,7 @@ class OnePostFragment : Fragment() {
                 viewModel.removeById(posts!!.id)
                 Toast.makeText(
                     requireActivity(),
-                    "Удалено",
+                    getString(R.string.deleted),
                     Toast.LENGTH_SHORT
                 ).show()
                 findNavController().navigateUp()
@@ -103,45 +101,6 @@ class OnePostFragment : Fragment() {
         }
 
         binding.menu.visibility = View.GONE
-//        binding.menu.setOnClickListener {
-//            PopupMenu(it.context, it).apply {
-//                inflate(R.menu.options_post)
-//                setOnMenuItemClickListener { itemView ->
-//                    when (itemView.itemId) {
-//                        R.id.deleteView -> {
-//                            if (postId != null) {
-//                                viewModel.removeById(postId)
-//                                findNavController().navigateUp()
-//                            }
-//                            true
-//                        }
-//                        R.id.viewPostAuthor -> {
-//                            if (onePost != null) {
-//                                viewModel.viewByAuthor(onePost.author)
-//                            }
-//                            findNavController().navigateUp()
-//                            true
-//                        }
-//                        R.id.editView -> {
-//                            if (onePost != null) {
-//                                viewModel.edit(onePost)
-//                                val bundle = Bundle()
-//                                bundle.putString("textPost", onePost.content)
-//                                bundle.putString("urlLink", onePost.urlLink)
-//                                bundle.putString("image", onePost.image)
-//                                bundle.putString("owner", "onePost") //для определения логики навигации
-//                                findNavController().navigate(
-//                                    R.id.action_onePostFragment_to_postFragment,
-//                                    bundle
-//                                )
-//                            }
-//                            true
-//                        }
-//                        else -> false
-//                    }
-//                }
-//            }.show()
-//        }
 
         binding.share.setOnClickListener {
             if (onePost != null) {

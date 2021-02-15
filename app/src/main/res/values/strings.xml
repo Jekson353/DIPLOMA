@@ -32,4 +32,6 @@
     <string name="all_post_author">All posts author</string>
     <string name="no_app_url">No app for open URL</string>
     <string name="about_app">Version 1.0 by Samoylenko A.S.</string>
+    <string name="deleted">Deleted</string>
+    <string name="sybmol_has_more">\"The number of characters is not more than 100. Now they are\"</string>
 </resources>

@@ -33,4 +33,6 @@
     <string name="all_post_author">Все посты автора</string>
     <string name="no_app_url">Нет приложений для показа ссылки</string>
     <string name="about_app">Версия 1.0. Автор Самойленко А.С.</string>
+    <string name="deleted">Удалено</string>
+    <string name="sybmol_has_more">\"Количество символов не более 100. Сейчас их \"</string>
 </resources>

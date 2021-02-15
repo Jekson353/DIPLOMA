@@ -1,11 +1,11 @@
 package com.samoylenko.kt12.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -27,7 +27,7 @@ class FeedFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.action_bar, menu);
+        inflater.inflate(R.menu.action_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -37,11 +37,9 @@ class FeedFragment : Fragment() {
         if (id == R.id.demo_data) {
             viewModel.getDemoData(this.requireContext())
         }
-        if (id == R.id.index_page) {
-            viewModel.onIndexPage()
-        }
         if (id == R.id.about) {
-            Toast.makeText(requireActivity(), getString(R.string.about_app), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), getString(R.string.about_app), Toast.LENGTH_LONG)
+                .show()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -52,8 +50,25 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val onAuthor = arguments?.getBoolean("onAuthor")
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
+
+        val callback = object : OnBackPressedCallback(
+            true
+        ) {
+            override fun handleOnBackPressed() {
+                if (onAuthor!!) {
+                    viewModel.onIndexPage()
+                } else {
+                    findNavController().popBackStack()
+                }
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
 
         val adapter = PostAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
@@ -73,12 +88,12 @@ class FeedFragment : Fragment() {
             }
 
             override fun onAuthor(post: Post) {
+                val bundle2 = Bundle()
+                bundle2.putBoolean("onAuthor", true)
                 viewModel.viewByAuthor(post.author)
+                findNavController().navigate(R.id.feedFragment, bundle2)
             }
 
-            override fun onIndexPage() {
-                viewModel.onIndexPage()
-            }
 
             override fun onClickPost(post: Post) {
                 val bundle = Bundle()
@@ -95,8 +110,8 @@ class FeedFragment : Fragment() {
 
             override fun goToUrl(post: Post) {
                 var url = post.urlLink
-                if (!url.equals("")){
-                    if (!url.startsWith("http://") && !url.startsWith("https://")){
+                if (!url.equals("")) {
+                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
                         url = "http://" + url
                     }
                 }
@@ -117,8 +132,8 @@ class FeedFragment : Fragment() {
 
             override fun onShare(post: Post) {
                 val intent = Intent(Intent.ACTION_SEND)
-                if (!post.image.equals("")){
-                    val file = File (post.image)
+                if (!post.image.equals("")) {
+                    val file = File(post.image)
                     val myPhotoFileUri = FileProvider.getUriForFile(
                         requireActivity(),
                         requireActivity().applicationContext.packageName + ".provider",
@@ -127,7 +142,7 @@ class FeedFragment : Fragment() {
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     intent.putExtra(Intent.EXTRA_STREAM, myPhotoFileUri)
                     intent.setType("image/*")
-                }else{
+                } else {
                     intent.setType("text/plain")
                 }
                 val textToShare = post.author + "\n" + post.content
@@ -141,14 +156,16 @@ class FeedFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            startActivity(Intent.createChooser(intent, getString(R.string.share_from_help))).also { result ->
+                            startActivity(
+                                Intent.createChooser(
+                                    intent,
+                                    getString(R.string.share_from_help)
+                                )
+                            ).also {
                                 viewModel.shareById(post.id)
                             }
                         }
                     }
-//                    .apply {
-//                        viewModel.shareById(post.id)
-//                    }
             }
         })
 

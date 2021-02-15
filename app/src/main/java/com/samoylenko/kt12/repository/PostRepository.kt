@@ -12,6 +12,6 @@ interface PostRepository {
     fun save(post: Post)
     fun removeById(id: Long)
     fun onIndexPage(): LiveData<List<Post>>
-    fun getDemoData(context: Context):LiveData<List<Post>>
+    fun getDemoData(context: Context): LiveData<List<Post>>
     fun viewByAuthor(author: String)
 }

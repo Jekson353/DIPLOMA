@@ -8,6 +8,5 @@
         app:showAsAction="always"
         android:title="@string/load_demo"/>
 
-    <item android:id="@+id/index_page" android:title="@string/index_page" />
     <item android:id="@+id/about" android:title="@string/about" />
 </menu>

@@ -58,7 +58,6 @@ class PostFragment : Fragment() {
                 binding.inputImagePost.setImageURI(image.toUri())
             }
         }
-        //binding.editTextPost.requestFocus()
 
 
         val callback = object : OnBackPressedCallback(
@@ -119,7 +118,7 @@ class PostFragment : Fragment() {
             } else if (content.length > 100) {
                 Toast.makeText(
                     requireActivity(),
-                    "Количество символов не более 100. Сейчас их ${content.length}",
+                    getString(R.string.sybmol_has_more) + content.length,
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
@@ -208,11 +207,11 @@ class MyDialogFragment : DialogFragment() {
             builder.setTitle(getString(R.string.confirmation))
                 .setMessage(getString(R.string.sure_deleted))
                 .setCancelable(true)
-                .setPositiveButton(getString(R.string.yes)) { dialog, id ->
+                .setPositiveButton(getString(R.string.yes)) { _, _ ->
                     val intent = Intent()
                     targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
                 }
-                .setNegativeButton(getString(R.string.no)) { dialog, id ->
+                .setNegativeButton(getString(R.string.no)) { _, _ ->
                     Toast.makeText(
                         activity, getString(R.string.cancel_operation),
                         Toast.LENGTH_LONG
