@@ -35,4 +35,6 @@
     <string name="about_app">Версия 1.0. Автор Самойленко А.С.</string>
     <string name="deleted">Удалено</string>
     <string name="sybmol_has_more">\"Количество символов не более 100. Сейчас их \"</string>
+    <string name="double_click_exit">Для выхода нажмите НАЗАД два раза</string>
+    <string name="thisimagepost">Здесь должна быть картинка</string>
 </resources>

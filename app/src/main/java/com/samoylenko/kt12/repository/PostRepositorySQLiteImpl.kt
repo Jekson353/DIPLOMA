@@ -4,9 +4,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.samoylenko.kt12.dao.PostDao
 import com.samoylenko.kt12.dto.Post
+import com.samoylenko.kt12.entity.PostEntity
+import com.samoylenko.kt12.entity.toPost
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -15,90 +17,35 @@ import java.io.OutputStream
 class PostRepositorySQLiteImpl(
     private val dao: PostDao
 ) : PostRepository {
-    private var posts = emptyList<Post>()
-    private val data: MutableLiveData<List<Post>> = MutableLiveData(posts)
 
+    override fun getDemoData(context: Context): LiveData<List<Post>> =
+        dao.getAll().map {
+            it.map(PostEntity::toPost)
+        }.also {
+            demoToSQL(context)
+        }
 
-    init {
-        posts = dao.getAll()
-        data.value = posts
-    }
-
-    override fun onIndexPage(): LiveData<List<Post>> {
-        posts = dao.getAll()
-        data.value = posts
-        return data
-    }
-
-    override fun getDemoData(context: Context): LiveData<List<Post>> {
-        demoToSQL(context)
-        posts = dao.getAll()
-        data.value = posts
-        return data
-    }
-
-    override fun getAll(): LiveData<List<Post>> = data
+    override fun getAll(): LiveData<List<Post>> = dao.getAll().map { it.map(PostEntity::toPost) }
 
     override fun likesById(id: Long) {
         dao.likesById(id)
-        posts = posts.map {
-            if (it.id != id) {
-                it
-            } else {
-                it.copy(like = it.like + 1)
-            }
-        }
-        data.value = posts
     }
 
     override fun dislikeById(id: Long) {
         dao.dislikeById(id)
-        posts = posts.map {
-            if (it.id != id) {
-                it
-            } else {
-                it.copy(like = it.like - 1)
-            }
-        }
-        data.value = posts
     }
 
     override fun shareById(id: Long) {
         dao.shareById(id)
-        posts = posts.map {
-            if (it.id != id) {
-                it
-            } else {
-                it.copy(sharing = it.sharing + 1)
-            }
-        }
-        data.value = posts
     }
 
     override fun save(post: Post) {
-        val saved = dao.save(post)
-        if (post.id == 0L) {
-            posts = listOf(saved) + posts
-            data.value = posts
-            return
-        }
-        posts = posts.map {
-            if (it.id != post.id) it else saved
-        }
-        data.value = posts
+        dao.save(PostEntity.fromPost(post))
     }
 
     override fun removeById(id: Long) {
         dao.removeById(id)
-        posts = posts.filter { it.id != id }
-        data.value = posts
     }
-
-    override fun viewByAuthor(author: String) {
-        posts = posts.filter { it.author == author }
-        data.value = posts
-    }
-
 
     //хардкодинг данных. И пересохранение файла из Drawable внутрь приложения...
     fun demoToSQL(context: Context): List<Post> {
@@ -172,22 +119,28 @@ class PostRepositorySQLiteImpl(
         val p = demoPosts.size
         while (i < p) {
             val pathImage = saveFile(demoPosts[i].image.toUri(), context)
-            dao.save(demoPosts[i].copy(author = demoPosts[i].author, image = pathImage))
+            dao.save(
+                PostEntity.fromPost(
+                    demoPosts[i].copy(
+                        author = demoPosts[i].author,
+                        image = pathImage
+                    )
+                )
+            )
             i++
         }
         return demoPosts
     }
 
     fun saveFile(uri: Uri, context: Context): String {
-        val filename2: String
         val name = uri.path
-        if (name.equals("/drawable/demo1")) {
-            filename2 = "demo1.jpg"
+        val filename2: String = if (name.equals("/drawable/demo1")) {
+            "demo1.jpg"
         } else {
-            filename2 = "demo2.jpg"
+            "demo2.jpg"
         }
 
-        val inputStream: InputStream? = context.getContentResolver().openInputStream(uri)
+        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
         val pathFile = filename2.let { context.filesDir?.resolve(it) }
         val to: File = pathFile as File
         val out: OutputStream = FileOutputStream(to)

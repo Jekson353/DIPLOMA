@@ -70,11 +70,11 @@ class PostViewHolder(
             }
             like.text = Calc.intToText(post.like)
             share.text = post.sharing.toString()
-            if (!post.urlLink.equals("")) {
+            if (post.urlLink.isNotEmpty()) {
                 urlLink.visibility = View.VISIBLE
-                urlLink.setText(post.urlLink)
+                urlLink.text = post.urlLink
             }
-            if (!post.image.equals("")) {
+            if (post.image.isNotEmpty()) {
                 layoutLink.visibility = View.VISIBLE
                 inputImagePost.setImageURI(post.image.toUri())
             }

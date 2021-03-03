@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.samoylenko.kt12.db.AppDb
 import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.repository.PostRepository
@@ -27,16 +28,20 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository = PostRepositorySQLiteImpl(
         AppDb.getInstance(application).postDao
     )
-    val data = repository.getAll()
+    var data = repository.getAll()
     val edited = MutableLiveData(empty)
 
-    fun onIndexPage() = repository.onIndexPage()
+    fun onIndexPage(){
+        data = repository.getAll()
+    }
     fun likesById(id: Long) = repository.likesById(id)
     fun dislikeById(id: Long) = repository.dislikeById(id)
     fun shareById(id: Long) = repository.shareById(id)
     fun removeById(id: Long) = repository.removeById(id)
     fun getDemoData(context: Context) = repository.getDemoData(context)
-    fun viewByAuthor(author: String) = repository.viewByAuthor(author)
+    fun viewByAuthor(author: String){
+        data = data.map { it.filter { it.author == author } }
+    }
     fun save() {
         edited.value?.let {
             repository.save(it)
@@ -64,30 +69,30 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         if (edited.value?.content == text && edited.value?.urlLink == textUrlLink && edited.value?.image == pathImage) {
             return
         }
-        if (textUrlLink.equals("") && pathImage.equals("")) {
+        if (textUrlLink == "" && pathImage == "") {
             edited.value = edited.value?.copy(
-                published = dateText + ' ' + timeText,
+                published = "$dateText $timeText",
                 content = text,
                 urlLink = "",
                 image = ""
             )
-        } else if (pathImage.equals("") && !textUrlLink.equals("")) {
+        } else if (pathImage == "" && textUrlLink != "") {
             edited.value = edited.value?.copy(
-                published = dateText + ' ' + timeText,
+                published = "$dateText $timeText",
                 content = text,
                 urlLink = textUrlLink,
                 image = ""
             )
-        } else if (!pathImage.equals("") && textUrlLink.equals("")) {
+        } else if (pathImage != "" && textUrlLink == "") {
             edited.value = edited.value?.copy(
-                published = dateText + ' ' + timeText,
+                published = "$dateText $timeText",
                 content = text,
                 urlLink = "",
                 image = pathImage
             )
         } else {
             edited.value = edited.value?.copy(
-                published = dateText + ' ' + timeText,
+                published = "$dateText $timeText",
                 content = text,
                 urlLink = textUrlLink,
                 image = pathImage

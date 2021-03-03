@@ -20,17 +20,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.samoylenko.kt12.R
-import com.samoylenko.kt12.databinding.FragmentPostBinding
+import com.samoylenko.kt12.databinding.FragmentNewPostBinding
+import com.samoylenko.kt12.dto.Post
 import com.samoylenko.kt12.util.AndroidUtils
 import com.samoylenko.kt12.viewmodel.PostViewModel
-import kotlinx.android.synthetic.main.fragment_post.*
+import kotlinx.android.synthetic.main.fragment_new_post.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
 
-class PostFragment : Fragment() {
+class NewPostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
     var pathImage = "" //полный путь к изображению
     private val REQUEST_CODE_DELETE_IMAGE = 50
@@ -41,30 +42,31 @@ class PostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentPostBinding.inflate(inflater, container, false)
+        val binding = FragmentNewPostBinding.inflate(inflater, container, false)
 
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val textPost = arguments?.getString("textPost")
-        val urlLink = arguments?.getString("urlLink")
+        val editedPost: Post? = arguments?.getSerializable("toEditPost") as? Post
         val owner = arguments?.getString("owner")
-        val image = arguments?.getString("image")
 
-        binding.editTextPost.setText(textPost)
-        binding.inputUrlLink.setText(urlLink)
-        if (!image.equals("")) {
-            if (image != null) {
-                pathImage = image //при запуске - сохраняем путь в переменную
-                binding.layoutImage.visibility = View.VISIBLE
-                binding.inputImagePost.setImageURI(image.toUri())
+        editedPost?.let {
+            it.image.let { img ->
+                if (img.isNotEmpty()) {
+                    pathImage = img //при запуске - сохраняем путь в переменную
+                    binding.layoutImage.visibility = View.VISIBLE
+                    binding.inputImagePost.setImageURI(img.toUri())
+                }
             }
         }
+
+        binding.editTextPost.setText(editedPost?.content)
+        binding.inputUrlLink.setText(editedPost?.urlLink)
 
 
         val callback = object : OnBackPressedCallback(
             true
         ) {
             override fun handleOnBackPressed() {
-                if (owner.equals("onePost")) {
+                if (owner == "onePost") {
                     viewModel.noSave()
                     findNavController().popBackStack()
                     Toast.makeText(
@@ -127,8 +129,8 @@ class PostFragment : Fragment() {
             viewModel.changeContent(content, urlPost, pathImage)
             viewModel.save()
 
-            AndroidUtils.hideSoftKeyBoard(requireView())
-            if (owner.equals("onePost")) {
+            context?.let { it1 -> AndroidUtils.hideSoftKeyBoard(it1) }
+            if (owner == "onePost") {
                 findNavController().navigate(R.id.action_postFragment_to_feedFragment)
             } else {
                 findNavController().navigateUp()
@@ -156,10 +158,10 @@ class PostFragment : Fragment() {
                 if (resultCode == RESULT_OK) {
 
                     //получаем имя файла
-                    val uri: Uri? = data?.getData()
+                    val uri: Uri? = data?.data
                     val cursor: Cursor? =
                         uri?.let {
-                            context?.getContentResolver()?.query(it, null, null, null, null)
+                            context?.contentResolver?.query(it, null, null, null, null)
                         }
                     val nameIndex: Int = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     cursor.moveToFirst()
@@ -172,7 +174,7 @@ class PostFragment : Fragment() {
 
                     //копируем файл во внотреннюю структуру приложения
                     val originalFile: InputStream? = uri.let {
-                        context?.getContentResolver()?.openInputStream(
+                        context?.contentResolver?.openInputStream(
                             it
                         )
                     }
@@ -188,9 +190,7 @@ class PostFragment : Fragment() {
                         }
                     }
                     out.close()
-                    if (originalFile != null) {
-                        originalFile.close()
-                    }
+                    originalFile?.close()
                     //при загрузке изображения, меняем путь в переменной, т.к. изображение могло измениться
                     pathImage = to.absolutePath
                     editTextPost.requestFocus()
@@ -209,7 +209,7 @@ class MyDialogFragment : DialogFragment() {
                 .setCancelable(true)
                 .setPositiveButton(getString(R.string.yes)) { _, _ ->
                     val intent = Intent()
-                    targetFragment!!.onActivityResult(targetRequestCode, RESULT_OK, intent)
+                    targetFragment?.onActivityResult(targetRequestCode, RESULT_OK, intent)
                 }
                 .setNegativeButton(getString(R.string.no)) { _, _ ->
                     Toast.makeText(

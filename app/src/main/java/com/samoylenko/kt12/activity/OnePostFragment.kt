@@ -20,7 +20,7 @@ import java.io.File
 
 class OnePostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(ownerProducer = { requireActivity() })
-    var posts: Post? = null
+    var post: Post? = null
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbar_one_post, menu)
@@ -28,11 +28,9 @@ class OnePostFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
-
-        if (id == R.id.deleteView) {
-            if (posts?.id != null) {
-                viewModel.removeById(posts!!.id)
+        when (item.itemId) {
+            R.id.deleteView -> post?.id?.let {
+                viewModel.removeById(it)
                 Toast.makeText(
                     requireActivity(),
                     getString(R.string.deleted),
@@ -40,14 +38,10 @@ class OnePostFragment : Fragment() {
                 ).show()
                 findNavController().navigateUp()
             }
-        }
-        if (id == R.id.editView) {
-            if (posts?.id != null) {
-                viewModel.edit(posts!!)
+            R.id.editView -> post?.let {
+                viewModel.edit(it)
                 val bundle = Bundle()
-                bundle.putString("textPost", posts?.content)
-                bundle.putString("urlLink", posts?.urlLink)
-                bundle.putString("image", posts?.image)
+                bundle.putSerializable("toEditPost", it)
                 bundle.putString("owner", "onePost") //для определения логики навигации
 
                 findNavController().navigate(
@@ -68,33 +62,22 @@ class OnePostFragment : Fragment() {
         setHasOptionsMenu(true)
 
         val binding = CardPostBinding.inflate(inflater, container, false)
-        val postId = arguments?.getLong("idPost")
-        val onePost: Post? = postId?.let {
-            Post(
-                id = it,
-                author = arguments?.getString("author")!!,
-                content = arguments?.getString("content")!!,
-                published = arguments?.getString("txtDate")!!,
-                sharing = arguments?.getInt("share")!!,
-                like = arguments?.getInt("like")!!,
-                urlLink = arguments?.getString("urlLink")!!,
-                image = arguments?.getString("image")!!,
-            )
-        }
-        posts = onePost
+        val onePost: Post? = arguments?.getSerializable("post") as? Post
+
+        post = onePost
         var likesInt = onePost?.like
         var sharingInt = onePost?.sharing
 
         binding.likes.setOnClickListener {
-            if (postId != null) {
-                viewModel.likesById(postId)
+            onePost?.id?.let {
+                viewModel.likesById(it)
                 likesInt = likesInt?.plus(1)
                 binding.like.text = likesInt.toString()
             }
         }
         binding.dislike.setOnClickListener {
-            if (postId != null) {
-                viewModel.dislikeById(postId)
+            onePost?.id?.let {
+                viewModel.dislikeById(it)
                 likesInt = likesInt?.minus(1)
                 binding.like.text = likesInt.toString()
             }
@@ -103,32 +86,36 @@ class OnePostFragment : Fragment() {
         binding.menu.visibility = View.GONE
 
         binding.share.setOnClickListener {
-            if (onePost != null) {
+            onePost.let {
                 val intent = Intent(Intent.ACTION_SEND)
-                if (!onePost.image.equals("")) {
-                    val img = onePost.image
-                    val file = File(img)
-                    val myPhotoFileUri = FileProvider.getUriForFile(
-                        requireActivity(),
-                        requireActivity().applicationContext.packageName + ".provider",
-                        file
-                    )
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    intent.putExtra(EXTRA_STREAM, myPhotoFileUri)
-                    intent.type = "image/*"
-                } else {
+                it?.image?.let { its ->
+                    if (its.isNotEmpty()) {
+                        val file = File(its)
+                        val myPhotoFileUri = FileProvider.getUriForFile(
+                            requireActivity(),
+                            requireActivity().applicationContext.packageName + ".provider",
+                            file
+                        )
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        intent.putExtra(EXTRA_STREAM, myPhotoFileUri)
+                        intent.type = "image/*"
+                    } else {
+                        intent.type = "text/plain"
+                    }
+                } ?: run {
                     intent.type = "text/plain"
                 }
 
-                val textToShare = onePost.author + "\n" + onePost.content
+                val textToShare = it?.author + "\n" + it?.content
                 intent.putExtra(Intent.EXTRA_TEXT, textToShare)
 
-                if (activity?.packageManager?.let { it1 -> intent.resolveActivity(it1) } != null) {
-                    viewModel.shareById(postId)
+                activity?.packageManager?.let { it1 ->
+                    intent.resolveActivity(it1)
+                    onePost?.id?.let { it2 -> viewModel.shareById(it2) }
                     sharingInt = sharingInt?.plus(1)
                     binding.share.text = sharingInt.toString()
                     startActivity(Intent.createChooser(intent, getString(R.string.share_from_help)))
-                } else {
+                } ?: run {
                     Toast.makeText(
                         requireActivity(),
                         getString(R.string.no_app_share),
@@ -146,9 +133,11 @@ class OnePostFragment : Fragment() {
         binding.textData.text = onePost?.content
         binding.like.text = onePost?.like.toString()
         binding.share.text = onePost?.sharing.toString()
-        if (!onePost?.image.equals("")) {
-            binding.layoutLink.visibility = View.VISIBLE
-            binding.inputImagePost.setImageURI(onePost?.image?.toUri())
+        onePost?.let {
+            if (it.image.isNotEmpty()) {
+                binding.layoutLink.visibility = View.VISIBLE
+                binding.inputImagePost.setImageURI(it.image.toUri())
+            }
         }
 
         return binding.root

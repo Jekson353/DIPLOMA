@@ -34,4 +34,6 @@
     <string name="about_app">Version 1.0 by Samoylenko A.S.</string>
     <string name="deleted">Deleted</string>
     <string name="sybmol_has_more">\"The number of characters is not more than 100. Now they are\"</string>
+    <string name="double_click_exit">Please click BACK again to exit</string>
+    <string name="thisimagepost">ThisImagePost</string>
 </resources>

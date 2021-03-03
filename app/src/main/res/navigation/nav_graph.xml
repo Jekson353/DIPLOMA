@@ -23,9 +23,9 @@
     </fragment>
     <fragment
         android:id="@+id/postFragment"
-        android:name="com.samoylenko.kt12.activity.PostFragment"
+        android:name="com.samoylenko.kt12.activity.NewPostFragment"
         android:label="PostFragment"
-        tools:layout="@layout/fragment_post">
+        tools:layout="@layout/fragment_new_post">
         <action
             android:id="@+id/action_postFragment_to_feedFragment"
             app:destination="@id/feedFragment" />

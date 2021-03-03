@@ -4,7 +4,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.samoylenko.kt12.R
 
-class MainFragmentActivity : AppCompatActivity(R.layout.activity_main_fragment) {
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

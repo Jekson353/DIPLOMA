@@ -3,10 +3,12 @@ package com.samoylenko.kt12.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,15 +34,13 @@ class FeedFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
-
-        if (id == R.id.demo_data) {
-            viewModel.getDemoData(this.requireContext())
-        }
-        if (id == R.id.about) {
-            Toast.makeText(requireActivity(), getString(R.string.about_app), Toast.LENGTH_LONG)
-                .show()
-            return true
+        when (item.itemId) {
+            R.id.demo_data -> viewModel.getDemoData(this.requireContext())
+            R.id.about -> Toast.makeText(
+                requireActivity(),
+                getString(R.string.about_app),
+                Toast.LENGTH_LONG
+            ).show()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -50,19 +50,29 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val onAuthor = arguments?.getBoolean("onAuthor")
+        val onAuthor = arguments?.getBoolean("onAuthor", false) ?: false
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-
+        var doubleBackToExitPressedOnce = false
         val callback = object : OnBackPressedCallback(
             true
         ) {
             override fun handleOnBackPressed() {
-                if (onAuthor!!) {
+                if (onAuthor) {
                     viewModel.onIndexPage()
-                } else {
                     findNavController().popBackStack()
+                } else {
+                    if (doubleBackToExitPressedOnce) {
+                        finishAffinity(requireActivity())
+                    }
+                    doubleBackToExitPressedOnce = true
+                    Toast.makeText(
+                        requireActivity(),
+                        getString(R.string.double_click_exit),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
                 }
             }
         }
@@ -88,31 +98,24 @@ class FeedFragment : Fragment() {
             }
 
             override fun onAuthor(post: Post) {
-                val bundle2 = Bundle()
-                bundle2.putBoolean("onAuthor", true)
+                val bundle = Bundle()
+                bundle.putBoolean("onAuthor", true)
                 viewModel.viewByAuthor(post.author)
-                findNavController().navigate(R.id.feedFragment, bundle2)
+                findNavController().navigate(R.id.feedFragment, bundle)
             }
 
 
             override fun onClickPost(post: Post) {
                 val bundle = Bundle()
-                bundle.putLong("idPost", post.id)
-                bundle.putString("author", post.author)
-                bundle.putString("txtDate", post.published)
-                bundle.putString("content", post.content)
-                bundle.putInt("like", post.like)
-                bundle.putInt("share", post.sharing)
-                bundle.putString("image", post.image)
-                bundle.putString("urlLink", post.urlLink)
+                bundle.putSerializable("post", post)
                 findNavController().navigate(R.id.action_feedFragment_to_onePostFragment, bundle)
             }
 
             override fun goToUrl(post: Post) {
                 var url = post.urlLink
-                if (!url.equals("")) {
+                if (url != "") {
                     if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                        url = "http://" + url
+                        url = "http://$url"
                     }
                 }
 
@@ -132,7 +135,7 @@ class FeedFragment : Fragment() {
 
             override fun onShare(post: Post) {
                 val intent = Intent(Intent.ACTION_SEND)
-                if (!post.image.equals("")) {
+                if (post.image.isNotEmpty()) {
                     val file = File(post.image)
                     val myPhotoFileUri = FileProvider.getUriForFile(
                         requireActivity(),
@@ -141,9 +144,9 @@ class FeedFragment : Fragment() {
                     )
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     intent.putExtra(Intent.EXTRA_STREAM, myPhotoFileUri)
-                    intent.setType("image/*")
+                    intent.type = "image/*"
                 } else {
-                    intent.setType("text/plain")
+                    intent.type = "text/plain"
                 }
                 val textToShare = post.author + "\n" + post.content
 
@@ -183,9 +186,7 @@ class FeedFragment : Fragment() {
                 return@observe
             }
             val bundle = Bundle()
-            bundle.putString("textPost", post.content)
-            bundle.putString("urlLink", post.urlLink)
-            bundle.putString("image", post.image)
+            bundle.putSerializable("toEditPost", post)
 
             findNavController().navigate(R.id.action_feedFragment_to_postFragment, bundle)
         })

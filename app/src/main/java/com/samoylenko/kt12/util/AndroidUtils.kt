@@ -1,15 +1,16 @@
 package com.samoylenko.kt12.util
 
+import android.app.Activity
 import android.content.Context
-import android.view.View
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.view.inputmethod.InputMethodManager
 
 object AndroidUtils {
-    fun hideSoftKeyBoard(view: View) {
+    fun hideSoftKeyBoard(ctx: Context) {
         try {
-            val imm =
-                view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            val inputManager = ctx.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            val v = (ctx as Activity).currentFocus ?: return
+            inputManager.hideSoftInputFromWindow(v.windowToken, 0)
         } catch (e: Exception) {
             e.printStackTrace()
         }
